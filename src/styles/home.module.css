@@ -1,0 +1,47 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
+    color: whitesmoke;
+    height: 100vh;
+    background-image: url('https://live.staticflickr.com/65535/52524654654_f5de67eea5_o_d.jpg');
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.heroTitle {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 8px;
+    letter-spacing: 3px;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3rem;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    background-color: black;
+    color: hsla(0, 0%, 100%, .6);
+    padding: 16px;
+}
+
+.bold {
+    color: white;
+}
+.social_links ul {
+    display: flex;
+    gap: 16px;
+}
+
+.social_links li {
+    list-style-type: none;
+    &:hover {
+        color: white;
+    }
+}
