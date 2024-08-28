@@ -2,10 +2,10 @@
 
 import { UploadAction } from "@/actions/upload/upload";
 import { UploadContext } from "@/app/upload/page";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Text } from '@mantine/core'
 import { ImageInterface } from '@/app/upload/page';
-import { readFile } from "@/utils/file";
+import { hashFile, readFile } from "@/utils/file";
 
 function AsyncImageFrame({ image } : { image: ImageInterface }) {
     const uploadContext = useContext(UploadContext);
@@ -18,17 +18,17 @@ function AsyncImageFrame({ image } : { image: ImageInterface }) {
         setLoading(false)
     })
 
-    const handleImageClick = (image: ImageInterface) => {
-        uploadContext.setSelectedFile(image);
+    const handleImageClick = (image_key: string) => {
+        uploadContext.setSelectedFileKey(image_key);
     }
 
     return loading ? <Text>로딩 중..</Text> : (
         <img
-            key={image.name}
+            key={image.key}
             src={solvedUrl}
             alt={image.name}
             style={{ flex: '1 1 auto', maxWidth: '200px', height: 'auto' }}
-            onClick={() => handleImageClick(image)}
+            onClick={() => handleImageClick(image.key)}
         />
     )
 }
@@ -43,6 +43,7 @@ export default function Uploader() {
 
         const Images = Array.from(files).map(e => {
             return {
+                key: hashFile(e),
                 object: e,
                 name: e.name,
                 tags: [],
@@ -62,7 +63,7 @@ export default function Uploader() {
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {
-                    uploadContext.imageFiles?.map(e => <AsyncImageFrame image={e} />)
+                    uploadContext.imageFiles?.map(e => <AsyncImageFrame key={e.key} image={e} />)
                 }
             </div>
         </>

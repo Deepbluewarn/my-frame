@@ -8,3 +8,8 @@ export function readFile(file: File) {
         fr.readAsDataURL(file);
     });
 }
+
+export function hashFile(file: File): string {
+    const { name, size, type, lastModified } = file;
+    return `${name}-${size}-${type}-${lastModified}`;
+}
