@@ -23,10 +23,11 @@
     }
     .sidebar {
         flex: 1.5 0 auto;
-        order: 2
+        order: 2;
+        max-width: 100%;
     }
     .main {
         flex: 2 1 auto;
-        order: 1
+        order: 1;
     }
 }

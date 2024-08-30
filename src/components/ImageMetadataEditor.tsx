@@ -49,7 +49,9 @@ export default function ImageMetadataEditor() {
         <>
             <Text variant="">사진 편집</Text>
 
-            <Text variant='bold' size="lg">{image.name === '' ? '이름 추가' : image.name}</Text>
+            <Text className={Styles.imageTitle} variant='bold' size="lg">
+                {image.name === '' ? '이름 추가' : image.name}
+            </Text>
 
             <Text
                 size="xl"

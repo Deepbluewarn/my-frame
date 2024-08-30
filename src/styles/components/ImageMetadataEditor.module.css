@@ -5,6 +5,11 @@
     gap: 4px;
 }
 
+.imageTitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .title {
     margin-top: 8px;
 }
