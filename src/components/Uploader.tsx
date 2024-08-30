@@ -1,10 +1,10 @@
 'use client'
 
 import { UploadAction } from "@/actions/upload/upload";
-import { UploadContext } from "@/app/upload/page";
+import { UploadContext } from "@/context/UploadContext";
 import React, { useContext, useState } from "react";
 import { Text } from '@mantine/core'
-import { ImageInterface } from '@/app/upload/page';
+import { ImageInterface } from "@/interface/Upload";
 import { hashFile, readFile } from "@/utils/file";
 
 function AsyncImageFrame({ image } : { image: ImageInterface }) {
@@ -46,7 +46,7 @@ export default function Uploader() {
                 key: hashFile(e),
                 object: e,
                 name: e.name,
-                tags: [],
+                tags: new Set(),
                 url: readFile(e)
             } as ImageInterface
         })
