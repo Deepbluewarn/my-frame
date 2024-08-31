@@ -23,7 +23,7 @@ export default function ImageMetadataEditor() {
 
     const onImageNameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
         const target = e.currentTarget;
-        
+
         updateName(selectedFileKey, target.value);
     }
 
@@ -47,12 +47,6 @@ export default function ImageMetadataEditor() {
 
     return (
         <>
-            <Text variant="">사진 편집</Text>
-
-            <Text className={Styles.imageTitle} variant='bold' size="lg">
-                {image.name === '' ? '이름 추가' : image.name}
-            </Text>
-
             <Text
                 size="xl"
                 fw={900}
@@ -60,31 +54,42 @@ export default function ImageMetadataEditor() {
                 className={Styles.title}
                 gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
             >
+                사진 편집
+            </Text>
+
+            <Text
+                size="sm"
+                fw={900}
+                className={Styles.title}
+            >
                 이름
             </Text>
             <TextInput
-                description="이름을 입력하세요"
+                description="사진의 이름을 입력하세요"
                 placeholder="이름"
                 value={image.name}
                 onChange={onImageNameChanged}
             />
 
             <Text
-                size="xl"
+                size="sm"
                 fw={900}
-                variant="gradient"
                 className={Styles.title}
-                gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
             >
                 태그
             </Text>
-            <Box className={Styles.chip_container}>
-                {
-                    Array.from(image.tags).map(e => {
-                        return <PotatoChip key={e} content={e} onRemoveClick={onTagRemoveClicked} />
-                    })
-                }
-            </Box>
+            {
+                image.tags.size === 0 ? null : (
+                    <Box className={Styles.chip_container}>
+                        {
+                            Array.from(image.tags).map(e => {
+                                return <PotatoChip key={e} content={e} onRemoveClick={onTagRemoveClicked} />
+                            })
+                        }
+                    </Box>
+                )
+            }
+
 
             <TextInput
                 description="태그를 입력하세요 (공백으로 구분)"

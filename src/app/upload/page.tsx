@@ -10,12 +10,12 @@ export default function Upload() {
     return (
         <UploadProvider>
             <Box className={Styles.container}>
-                <Paper className={Styles.sidebar} shadow="xs">
+                <Paper className={Styles.sidebar} withBorder>
                     <ImageMetadataEditor />
                 </Paper>
-                <main className={Styles.main}>
+                <Paper className={Styles.main}>
                     <Uploader />
-                </main>
+                </Paper>
             </Box>
         </UploadProvider>
     )

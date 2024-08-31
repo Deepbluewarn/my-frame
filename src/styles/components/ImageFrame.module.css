@@ -8,6 +8,7 @@
     justify-content: center;
     align-items: center;
     padding: 10px;
+    opacity: .6;
 }
 
 .image {

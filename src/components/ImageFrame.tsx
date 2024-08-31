@@ -12,7 +12,7 @@ export default function ImageFrame({ image } : { image: ImageInterface }) {
     }
 
     return (
-        <Paper shadow="xs" className={Styles.container}>
+        <Paper shadow="lg" className={Styles.container}>
             <img
                 key={image.key}
                 src={URL.createObjectURL(image.object)}

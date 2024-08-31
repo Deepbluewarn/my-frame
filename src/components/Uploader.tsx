@@ -6,6 +6,8 @@ import React, { useContext } from "react";
 import { ImageInterface } from "@/interface/Upload";
 import { hashFile, readFile } from "@/utils/file";
 import ImageFrame from "./ImageFrame";
+import Styles from '@/styles/components/Uploader.module.css';
+import { Button, Paper } from "@mantine/core";
 
 export default function Uploader() {
     const uploadContext = useContext(UploadContext);
@@ -30,14 +32,43 @@ export default function Uploader() {
 
     return (
         <>
-            <form action={UploadAction}>
-                <input type="file" name="file" 
-                    accept="image/*"
-                    multiple onChange={onFileChanged} />
-                <input type="submit" value="Upload" />
-            </form>
+            <Paper className={Styles.formContainer} withBorder>
+                <form action={UploadAction} className={Styles.form}>
+                    <input
+                        type="file"
+                        name="file"
+                        id="selectFile"
+                        accept="image/*"
+                        multiple
+                        onChange={onFileChanged}
+                        className={Styles.fileInput}
+                    />
+                    <input
+                        type="submit"
+                        id="submit_files"
+                        className={Styles.fileInput}
+                    />
+                    <Button 
+                        component='label'
+                        htmlFor="selectFile" 
+                    >
+                        사진 선택
+                    </Button>
+                    {
+                        uploadContext.imageFiles ? (
+                            <Button
+                                component='label'
+                                htmlFor="submit_files"
+                            >
+                                {`${uploadContext.imageFiles.length}개 업로드`}
+                            </Button>
+                        ) : null
+                    }
+                </form>
+            </Paper>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+
+            <div className={Styles.imageFrameContainer}>
                 {
                     uploadContext.imageFiles?.map(e => <ImageFrame key={e.key} image={e} />)
                 }
