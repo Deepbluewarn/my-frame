@@ -11,8 +11,13 @@ export default function ImageFrame({ image } : { image: ImageInterface }) {
         uploadContext.setSelectedFileKey(image_key);
     }
 
+    const styles = [
+        uploadContext.selectedFileKey === image.key ? Styles.selected : '',
+        Styles.container,
+    ].join(' ');
+
     return (
-        <Paper shadow="lg" className={Styles.container}>
+        <Paper shadow="lg" className={styles}>
             <img
                 key={image.key}
                 src={URL.createObjectURL(image.object)}
