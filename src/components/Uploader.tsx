@@ -2,34 +2,29 @@
 
 import { UploadAction } from "@/actions/upload/upload";
 import { UploadContext } from "@/context/UploadContext";
-import React, { useContext, useState } from "react";
-import { Text } from '@mantine/core'
+import React, { useContext } from "react";
+import { Paper } from '@mantine/core'
 import { ImageInterface } from "@/interface/Upload";
 import { hashFile, readFile } from "@/utils/file";
+import Styles from '@/styles/components/ImageFrame.module.css'
 
-function AsyncImageFrame({ image } : { image: ImageInterface }) {
+function ImageFrame({ image } : { image: ImageInterface }) {
     const uploadContext = useContext(UploadContext);
-
-    const [ solvedUrl, setSolvedUrl ] = useState('');
-    const [ loading, setLoading ] = useState(true);
-
-    image.url.then(s => {
-        setSolvedUrl(s)
-        setLoading(false)
-    })
 
     const handleImageClick = (image_key: string) => {
         uploadContext.setSelectedFileKey(image_key);
     }
 
-    return loading ? <Text>로딩 중..</Text> : (
-        <img
-            key={image.key}
-            src={solvedUrl}
-            alt={image.name}
-            style={{ flex: '1 1 auto', maxWidth: '200px', height: 'auto' }}
-            onClick={() => handleImageClick(image.key)}
-        />
+    return (
+        <Paper shadow="xs" className={Styles.container}>
+            <img
+                key={image.key}
+                src={URL.createObjectURL(image.object)}
+                alt={image.name}
+                className={Styles.image}
+                onClick={() => handleImageClick(image.key)}
+            />
+        </Paper>
     )
 }
 
@@ -57,13 +52,15 @@ export default function Uploader() {
     return (
         <>
             <form action={UploadAction}>
-                <input type="file" name="file" multiple onChange={onFileChanged} />
+                <input type="file" name="file" 
+                    accept="image/*"
+                    multiple onChange={onFileChanged} />
                 <input type="submit" value="Upload" />
             </form>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {
-                    uploadContext.imageFiles?.map(e => <AsyncImageFrame key={e.key} image={e} />)
+                    uploadContext.imageFiles?.map(e => <ImageFrame key={e.key} image={e} />)
                 }
             </div>
         </>
