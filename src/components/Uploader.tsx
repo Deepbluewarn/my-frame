@@ -20,10 +20,9 @@ export default function Uploader() {
         const Images = Array.from(files).map(e => {
             return {
                 key: hashFile(e),
-                object: e,
+                objectURL: URL.createObjectURL(e),
                 name: e.name,
                 tags: new Set(),
-                url: readFile(e)
             } as ImageInterface
         })
 
@@ -70,7 +69,16 @@ export default function Uploader() {
 
             <div className={Styles.imageFrameContainer}>
                 {
-                    uploadContext.imageFiles?.map(e => <ImageFrame key={e.key} image={e} />)
+                    uploadContext.imageFiles?.map(e => 
+                        <div key={e.key} onClick={() => uploadContext.setSelectedFileKey(e.key)}>
+                            <ImageFrame
+                                selected={e.key === uploadContext.selectedFileKey}
+                                imageKey={e.key}
+                                objectURL={e.objectURL}
+                                imageName={e.name}
+                            />
+                        </div>
+                    )
                 }
             </div>
         </>

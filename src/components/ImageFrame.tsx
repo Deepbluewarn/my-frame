@@ -1,30 +1,31 @@
-import { UploadContext } from '@/context/UploadContext';
-import { ImageInterface } from '@/interface/Upload';
 import Styles from '@/styles/components/ImageFrame.module.css'
 import { Paper } from '@mantine/core';
-import { useContext } from 'react';
+import React from 'react';
 
-export default function ImageFrame({ image } : { image: ImageInterface }) {
-    const uploadContext = useContext(UploadContext);
-
-    const handleImageClick = (image_key: string) => {
-        uploadContext.setSelectedFileKey(image_key);
-    }
+interface IImageFrame {
+    selected: boolean,
+    imageKey: string,
+    objectURL: string,
+    imageName: string
+}
+function ImageFrame(
+    { selected, imageKey, objectURL, imageName }: IImageFrame) {
 
     const styles = [
-        uploadContext.selectedFileKey === image.key ? Styles.selected : '',
+        selected ? Styles.selected : '',
         Styles.container,
     ].join(' ');
 
     return (
         <Paper shadow="lg" className={styles}>
             <img
-                key={image.key}
-                src={URL.createObjectURL(image.object)}
-                alt={image.name}
+                key={imageKey}
+                src={objectURL}
+                alt={imageName}
                 className={Styles.image}
-                onClick={() => handleImageClick(image.key)}
             />
         </Paper>
     )
 }
+
+export default React.memo(ImageFrame);
