@@ -17,6 +17,8 @@ export default function Uploader() {
 
         if (!files) return;
 
+        if (files.length === 0) return;
+
         const Images = Array.from(files).map(e => {
             return {
                 key: hashFile(e),
@@ -26,7 +28,17 @@ export default function Uploader() {
             } as ImageInterface
         })
 
-        uploadContext.setImageFiles(Images);
+        uploadContext.setImageFiles(old => {
+            if (!old) return Images;
+
+            Images.forEach(e => {
+                if (old.some(f => f.key === e.key)) return;
+
+                old.push(e);
+            })
+
+            return [...old];
+        });
     };
 
     return (
