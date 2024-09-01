@@ -23,6 +23,8 @@ function ImageFrame(
                 key={imageKey}
                 src={objectURL}
                 alt={imageName}
+                width={0}
+                height={0}
                 className={Styles.image}
             />
         </Paper>
