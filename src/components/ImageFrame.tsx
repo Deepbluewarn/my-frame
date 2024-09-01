@@ -1,5 +1,6 @@
 import Styles from '@/styles/components/ImageFrame.module.css'
 import { Paper } from '@mantine/core';
+import Image from 'next/image';
 import React from 'react';
 
 interface IImageFrame {
@@ -18,7 +19,7 @@ function ImageFrame(
 
     return (
         <Paper shadow="lg" className={styles}>
-            <img
+            <Image
                 key={imageKey}
                 src={objectURL}
                 alt={imageName}
