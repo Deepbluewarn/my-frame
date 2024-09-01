@@ -3,8 +3,9 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import { writeFile } from "fs/promises";
+import { ImageInterface } from "@/interface/Upload";
 
-export const UploadAction = async (data: FormData) => {
+export const UploadAction = async (metadata: ImageInterface[] | null, data: FormData) => {
     const files: File[] = [];
     data.forEach((value, key) => {
         if (key === 'file' && value instanceof File) {
@@ -12,6 +13,7 @@ export const UploadAction = async (data: FormData) => {
         }
     });
 
+    console.log(metadata);
     console.log(files);
 
     // if (!file || file.size <= 0) {

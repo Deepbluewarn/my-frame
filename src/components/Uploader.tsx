@@ -11,12 +11,13 @@ import { Button, Paper } from "@mantine/core";
 
 export default function Uploader() {
     const uploadContext = useContext(UploadContext);
+    const uploadActionWithMatadata = UploadAction.bind(null, uploadContext.imageFiles);
+    const [ uploadLoading, setUploadLoading ] = React.useState(false);
 
     const onFileChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files: FileList | null = e.target.files;
 
         if (!files) return;
-
         if (files.length === 0) return;
 
         const Images = Array.from(files).map((e): ImageInterface => {
@@ -60,10 +61,43 @@ export default function Uploader() {
         }
     }
 
+    const uploadSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const form = e.target as HTMLFormElement;
+        const fileInput = form.querySelector<HTMLInputElement>('#selectFile');
+
+        if (!fileInput || !fileInput.files) return;
+        if (!uploadContext.imageFiles) return;
+
+        setUploadLoading(true);
+
+        const data = new FormData();
+
+        uploadContext.imageFiles.forEach(e => {
+            const fileObject = Array.from(fileInput.files!).find(f => e.key === hashFile(f));
+
+            if (!fileObject) return;
+
+            data.append('file', fileObject);
+        });
+
+        const res = await uploadActionWithMatadata(data);
+
+        if (res && res.success) {
+            alert('업로드에 성공했습니다.');
+            uploadContext.setImageFiles([]);
+        } else {
+            alert('업로드에 실패했습니다.');
+        }
+
+        setUploadLoading(false);
+    }
+
     return (
         <>
             <Paper className={Styles.formContainer} withBorder>
-                <form action={UploadAction} className={Styles.form}>
+                <form onSubmit={uploadSubmit} className={Styles.form}>
                     <input
                         type="file"
                         name="file"
@@ -85,18 +119,21 @@ export default function Uploader() {
                         사진 선택
                     </Button>
                     {
-                        uploadContext.imageFiles ? (
+                        uploadContext.imageFiles && uploadContext.imageFiles.length > 0 ? (
                             <Button
                                 component='label'
                                 htmlFor="submit_files"
                             >
-                                {`${uploadContext.imageFiles.length}개 업로드`}
+                                {
+                                    uploadLoading ? 
+                                        `${uploadContext.imageFiles.length}개 업로드 중...` : 
+                                        `${uploadContext.imageFiles.length}개 업로드`
+                                }
                             </Button>
                         ) : null
                     }
                 </form>
             </Paper>
-
 
             <div className={Styles.imageFrameContainer}>
                 {
