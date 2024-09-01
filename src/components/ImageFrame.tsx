@@ -1,5 +1,5 @@
 import Styles from '@/styles/components/ImageFrame.module.css'
-import { Box, Paper, Text } from '@mantine/core';
+import { Box, CloseButton, Paper, Text } from '@mantine/core';
 import Image from 'next/image';
 import React from 'react';
 
@@ -22,6 +22,11 @@ function ImageFrame(
         <Paper shadow='lg' className={styles} withBorder>
             <Box className={Styles.overlay}>
                 <Text className={Styles.size}>{size}</Text>
+                <CloseButton 
+                    className={Styles.close} 
+                    radius={'100%'}
+                    size={'sm'}
+                />
             </Box>
             <Image
                 key={imageKey}

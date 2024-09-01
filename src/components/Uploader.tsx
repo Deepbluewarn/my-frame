@@ -42,6 +42,24 @@ export default function Uploader() {
         });
     };
 
+    const imageClicked = (e: React.MouseEvent, imageKey: string) => {
+        const target = e.target as HTMLElement;
+
+        if (target.closest('button')) {
+            uploadContext.setImageFiles(old => {
+                if (!old) return old;
+
+                return old.filter(e => e.key !== imageKey);
+            });
+
+            if (uploadContext.selectedFileKey === imageKey) {
+                uploadContext.setSelectedFileKey('');
+            }
+        } else {
+            uploadContext.setSelectedFileKey(imageKey);
+        }
+    }
+
     return (
         <>
             <Paper className={Styles.formContainer} withBorder>
@@ -83,7 +101,7 @@ export default function Uploader() {
             <div className={Styles.imageFrameContainer}>
                 {
                     uploadContext.imageFiles?.map(e => 
-                        <div key={e.key} onClick={() => uploadContext.setSelectedFileKey(e.key)}>
+                        <div key={e.key} onClick={(ev) => imageClicked(ev, e.key)}>
                             <ImageFrame
                                 selected={e.key === uploadContext.selectedFileKey}
                                 imageKey={e.key}
