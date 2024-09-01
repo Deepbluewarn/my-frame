@@ -1,5 +1,5 @@
 import Styles from '@/styles/components/ImageFrame.module.css'
-import { Paper } from '@mantine/core';
+import { Box, Paper, Text } from '@mantine/core';
 import Image from 'next/image';
 import React from 'react';
 
@@ -7,10 +7,11 @@ interface IImageFrame {
     selected: boolean,
     imageKey: string,
     objectURL: string,
-    imageName: string
+    imageName: string,
+    size: string,
 }
 function ImageFrame(
-    { selected, imageKey, objectURL, imageName }: IImageFrame) {
+    { selected, imageKey, objectURL, imageName, size }: IImageFrame) {
 
     const styles = [
         selected ? Styles.selected : '',
@@ -18,7 +19,10 @@ function ImageFrame(
     ].join(' ');
 
     return (
-        <Paper shadow="lg" className={styles}>
+        <Paper shadow='lg' className={styles} withBorder>
+            <Box className={Styles.overlay}>
+                <Text className={Styles.size}>{size}</Text>
+            </Box>
             <Image
                 key={imageKey}
                 src={objectURL}

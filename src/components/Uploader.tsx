@@ -4,7 +4,7 @@ import { UploadAction } from "@/actions/upload/upload";
 import { UploadContext } from "@/context/UploadContext";
 import React, { useContext } from "react";
 import { ImageInterface } from "@/interface/Upload";
-import { hashFile, readFile } from "@/utils/file";
+import { hashFile, formatFileSize } from "@/utils/file";
 import ImageFrame from "./ImageFrame";
 import Styles from '@/styles/components/Uploader.module.css';
 import { Button, Paper } from "@mantine/core";
@@ -19,13 +19,14 @@ export default function Uploader() {
 
         if (files.length === 0) return;
 
-        const Images = Array.from(files).map(e => {
+        const Images = Array.from(files).map((e): ImageInterface => {
             return {
                 key: hashFile(e),
                 objectURL: URL.createObjectURL(e),
                 name: e.name,
                 tags: new Set(),
-            } as ImageInterface
+                size: formatFileSize(e.size),
+            }
         })
 
         uploadContext.setImageFiles(old => {
@@ -88,6 +89,7 @@ export default function Uploader() {
                                 imageKey={e.key}
                                 objectURL={e.objectURL}
                                 imageName={e.name}
+                                size={e.size}
                             />
                         </div>
                     )
