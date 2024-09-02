@@ -6,23 +6,25 @@ export interface ImageInterface {
     title: string;
     description: string;
     tags: string[];
-    uploadedAt: Date;
-    likes: number;
-    comments: {
+    owner: mongoose.Schema.Types.ObjectId;
+    uploadedAt?: Date;
+    likes?: number;
+    comments?: {
         userId: mongoose.Schema.Types.ObjectId;
         username: string;
         text: string;
         createdAt: Date;
     }[];
-    visibility: 'public' | 'follow' | 'private';
+    visibility?: 'public' | 'follow' | 'private';
 }
 
 // 이미지 스키마 정의
-const ImageSchema: Schema = new Schema({
+export const ImageSchema: Schema = new Schema({
     url: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
     tags: { type: [String], required: true },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     uploadedAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },
     comments: [
@@ -36,4 +38,6 @@ const ImageSchema: Schema = new Schema({
     visibility: { type: String, enum: ['public', 'follow', 'private'], default: 'public' } // visibility 속성 추가
 });
 
-export default ImageSchema;
+const Image = mongoose.models.Image || mongoose.model<ImageInterface>('Image', ImageSchema);
+
+export default Image;

@@ -1,6 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { ImageInterface } from '@/interface/Upload';
-import ImageSchema from './Image';
 
 // 회원 인터페이스 정의
 export interface UserInterface extends Document {
@@ -31,7 +30,7 @@ const UserSchema: Schema = new Schema({
     bio: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    images: [ImageSchema],
+    images: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Image' }], 
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     socialLinks: {
