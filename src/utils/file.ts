@@ -10,8 +10,8 @@ export function readFile(file: File) {
 }
 
 export function hashFile(file: File): string {
-    const { name, size, type, lastModified } = file;
-    return `${name}-${size}-${type}-${lastModified}`;
+    const { name, size, type } = file;
+    return `${name}-${size}-${type}`;
 }
 
 /**
