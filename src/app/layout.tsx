@@ -5,6 +5,8 @@ import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import type { Metadata } from "next";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
 import Header from '@/components/Header';
+import HomeStyles from '@/styles/home.module.css'
+import { IconMail, IconBrandGithub } from '@tabler/icons-react';
 
 export const metadata: Metadata = {
   title: "My Frame",
@@ -26,6 +28,18 @@ export default function RootLayout({
           <MantineProvider>
             <Header fixed={true} />
             {children}
+            <footer className={HomeStyles.footer}>
+              <div>
+                <p>사진을 공유할 수 있는 소셜 플랫폼 <b className={HomeStyles.bold}>MY FRAME</b></p>
+                <p>이 사이트는 개인 포트폴리오 제작을 목적으로 만들어졌습니다.</p>
+              </div>
+              <div className={HomeStyles.social_links}>
+                <ul>
+                  <li><IconMail /></li>
+                  <li><IconBrandGithub /></li>
+                </ul>
+              </div>
+            </footer>
           </MantineProvider>
         </body>
       </UserProvider>
