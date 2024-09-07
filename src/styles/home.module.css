@@ -6,6 +6,9 @@
     align-items: center;
     color: whitesmoke;
     height: 100vh;
+}
+
+.background {
     background-image: url('https://live.staticflickr.com/65535/52524654654_f5de67eea5_o_d.jpg');
     background-position: 50%;
     background-repeat: no-repeat;
@@ -44,4 +47,22 @@
     &:hover {
         color: white;
     }
+}
+
+.image_container {
+    align-items: stretch;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.image_container img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
 }
