@@ -4,7 +4,7 @@ import { Upload } from "@aws-sdk/lib-storage";
 import { S3 } from "@aws-sdk/client-s3";
 import { getSession } from "@auth0/nextjs-auth0";
 import { createImage } from "@/services/Image";
-import { hashFile } from "@/utils/file";
+import { getImageDimensions } from "@/utils/file";
 import { addImageToUser, getUserBySub } from "@/services/User";
 import connectDB from '@/db/init';
 
@@ -50,19 +50,24 @@ export const UploadAction = async (metadata: ImageInterface[] | null, data: Form
     
     let metaFiles: MetaFileInterface[] = [];
 
-    metadata.forEach(e => {
+    for (const e of metadata) {
         const fileObject = Array.from(data.entries()).find(([key, file]) => {
-            if (key === 'file' && file instanceof File) {
-                return e.key === hashFile(file);
+            if (file instanceof File) {
+                return e.originalFileName === key;
             }
         });
         const metadata = e as MetaFileInterface;
 
         if (!fileObject) return;
 
-        metadata.fileObject = fileObject[1] as File;
+        const fileObj = fileObject[1] as File;
+        const dimensions = await getImageDimensions(fileObj);
+
+        metadata.fileObject = fileObj;
+        metadata.width = dimensions.width;
+        metadata.height = dimensions.height;
         metaFiles.push(metadata);
-    });
+    }
 
     try {
         const userDocument = await getUserBySub(user.sub);
@@ -76,6 +81,8 @@ export const UploadAction = async (metadata: ImageInterface[] | null, data: Form
     
             const savedImage = await createImage({
                 url,
+                width: metaFile.width,
+                height: metaFile.height,
                 title: metaFile?.name,
                 description: 'metaFile?.description',
                 tags: Array.from(metaFile?.tags),

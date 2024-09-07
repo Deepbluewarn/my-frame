@@ -13,7 +13,7 @@ export default function Uploader() {
     const uploadContext = useContext(UploadContext);
     const uploadActionWithMatadata = UploadAction.bind(null, uploadContext.imageFiles);
     const [ uploadLoading, setUploadLoading ] = React.useState(false);
-
+    
     const onFileChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files: FileList | null = e.target.files;
 
@@ -22,6 +22,7 @@ export default function Uploader() {
 
         const Images = Array.from(files).map((e): ImageInterface => {
             return {
+                originalFileName: e.name,
                 key: hashFile(e),
                 objectURL: URL.createObjectURL(e),
                 name: e.name,
@@ -74,21 +75,16 @@ export default function Uploader() {
 
         const data = new FormData();
 
-        uploadContext.imageFiles.forEach(e => {
-            const fileObject = Array.from(fileInput.files!).find(f => e.key === hashFile(f));
-
-            if (!fileObject) return;
-
-            data.append('file', fileObject);
-        });
-
+        for (const file of Array.from(fileInput.files)) {
+            data.append(file.name, file);
+        }
         const res = await uploadActionWithMatadata(data);
 
         if (res && res.success) {
             alert('업로드에 성공했습니다.');
             uploadContext.setImageFiles([]);
         } else {
-            alert('업로드에 실패했습니다.');
+            alert('업로드에 실패했습니다. ' +  res?.error ?? "");
         }
 
         setUploadLoading(false);
@@ -137,16 +133,16 @@ export default function Uploader() {
 
             <div className={Styles.imageFrameContainer}>
                 {
-                    uploadContext.imageFiles?.map(e => 
+                    uploadContext.imageFiles?.map(e =>
                         <div key={e.key} onClick={(ev) => imageClicked(ev, e.key)}>
-                            <ImageFrame
-                                selected={e.key === uploadContext.selectedFileKey}
-                                imageKey={e.key}
-                                objectURL={e.objectURL}
-                                imageName={e.name}
-                                size={e.size}
-                            />
-                        </div>
+                        <ImageFrame
+                            selected={e.key === uploadContext.selectedFileKey}
+                            imageKey={e.key}
+                            objectURL={e.objectURL}
+                            imageName={e.name}
+                            size={e.size}
+                        />
+                    </div>
                     )
                 }
             </div>

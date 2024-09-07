@@ -3,6 +3,8 @@ import mongoose, { Schema } from 'mongoose';
 // 이미지 인터페이스 정의
 export interface ImageInterface {
     url: string;
+    width: number;
+    height: number;
     title: string;
     description: string;
     tags: string[];
@@ -21,6 +23,8 @@ export interface ImageInterface {
 // 이미지 스키마 정의
 export const ImageSchema: Schema = new Schema({
     url: { type: String, required: true },
+    width: { type: Number, required: true },
+    height: { type: Number, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
     tags: { type: [String], required: true },

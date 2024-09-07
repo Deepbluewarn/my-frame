@@ -1,4 +1,5 @@
 export interface ImageInterface {
+    originalFileName: string,
     objectURL: string; // 이미지 파일의 URL (URL.createObjectURL()로 생성)
     key: string; // 파일을 찾을 때 사용하는 속성
     name: string; // 사용자가 지정한 파일의 이름
@@ -8,4 +9,6 @@ export interface ImageInterface {
 
 export interface MetaFileInterface extends ImageInterface {
     fileObject: File; // 실제 파일 객체
+    width: number;
+    height: number;
 }

@@ -1,3 +1,5 @@
+import sizeOf from 'image-size';
+
 export function readFile(file: File) {
     return new Promise<string>((resolve, reject) => {
         var fr = new FileReader();
@@ -32,3 +34,13 @@ export function formatFileSize(bytes: number, decimals: number = 2): string {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+export async function getImageDimensions(file: File): Promise<{ width: number, height: number }> {
+    const buffer = await file.arrayBuffer();
+    const uint8Array = new Uint8Array(buffer);
+    const dimensions = sizeOf(uint8Array);
+
+    return {
+        width: dimensions.width || 0,
+        height: dimensions.height || 0
+    }
+}
