@@ -1,8 +1,8 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import { ImageInterface } from '@/interface/Upload';
 
 // 회원 인터페이스 정의
-export interface UserInterface extends Document {
+export interface UserInterface {
     sub: string;
     username: string;
     email: string;
@@ -13,7 +13,7 @@ export interface UserInterface extends Document {
     images?: ImageInterface[];
     followers?: mongoose.Schema.Types.ObjectId[];
     following?: mongoose.Schema.Types.ObjectId[];
-    socialLinks: {
+    socialLinks?: {
         facebook?: string;
         twitter?: string;
         instagram?: string;
@@ -21,8 +21,10 @@ export interface UserInterface extends Document {
     };
 }
 
+type UserModel = Model<UserInterface>;
+
 // 회원 스키마 정의
-const UserSchema: Schema = new Schema({
+const UserSchema: Schema = new Schema<UserInterface, UserModel>({
     sub: { type: String, required: true, unique: true},
     username: { type: String, required: true, unique: true },
     email: { type: String, unique: true },
@@ -42,6 +44,6 @@ const UserSchema: Schema = new Schema({
 });
 
 // 모델 생성
-const User = mongoose.models.User || mongoose.model<UserInterface>('User', UserSchema);
+const User = mongoose.models.User as UserModel || mongoose.model<UserInterface, UserModel>('User', UserSchema);
 
 export default User;

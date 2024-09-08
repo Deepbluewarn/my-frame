@@ -25,7 +25,7 @@ export default async function Landing({
     const email = payload!.email;
     const profilePicture = payload!.picture;
 
-    const userData: Partial<UserInterface> = {
+    const userData: UserInterface = {
         sub, username, email, profilePicture,
     };
 

@@ -1,12 +1,13 @@
 import User, { UserInterface } from "@/db/models/User";
+import { Types, HydratedDocument } from "mongoose";
 
 export function getUserBySub(sub: string) {
     return User.findOne({ sub })
 }
 
-export async function createUser(user: Partial<UserInterface>) {
-    const newUser = new User(user);
-    await newUser.save();
+export async function createUser(user: UserInterface) {
+    const newUser: HydratedDocument<UserInterface> = new User(user);
+    return newUser.save();
 }
 
 export async function updateUserBySub(sub: string, updatedUserData: Partial<UserInterface>) {
@@ -18,7 +19,7 @@ export async function updateUserBySub(sub: string, updatedUserData: Partial<User
     return updatedUser;
 }
 
-export async function addImageToUser(sub: string, imageId: string) {
+export async function addImageToUser(sub: string, imageId: Types.ObjectId) {
     await User.findOneAndUpdate(
         { sub },
         { $push: { images: imageId } }

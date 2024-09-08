@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Model, Schema } from 'mongoose';
 
 // 이미지 인터페이스 정의
 export interface ImageInterface {
@@ -9,7 +9,7 @@ export interface ImageInterface {
     description: string;
     tags: string[];
     owner: mongoose.Schema.Types.ObjectId;
-    uploadedAt?: Date;
+    uploadedAt: Date;
     likes?: number;
     comments?: {
         userId: mongoose.Schema.Types.ObjectId;
@@ -17,11 +17,13 @@ export interface ImageInterface {
         text: string;
         createdAt: Date;
     }[];
-    visibility?: 'public' | 'follow' | 'private';
+    visibility: 'public' | 'follow' | 'private';
 }
 
+type ImageModel = Model<ImageInterface>;
+
 // 이미지 스키마 정의
-export const ImageSchema: Schema = new Schema({
+export const ImageSchema: Schema = new Schema<ImageInterface, ImageModel>({
     url: { type: String, required: true },
     width: { type: Number, required: true },
     height: { type: Number, required: true },
@@ -42,6 +44,6 @@ export const ImageSchema: Schema = new Schema({
     visibility: { type: String, enum: ['public', 'follow', 'private'], default: 'public' } // visibility 속성 추가
 });
 
-const Image = mongoose.models.Image || mongoose.model<ImageInterface>('Image', ImageSchema);
+const Image = mongoose.models.Image as ImageModel || mongoose.model<ImageInterface, ImageModel>('Image', ImageSchema);
 
 export default Image;
