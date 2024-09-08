@@ -4,6 +4,7 @@
     background-color: #0000006f;
     width: 100%;
     color: whitesmoke;
+    z-index: 99;
 }
 
 .fixed {

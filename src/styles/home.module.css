@@ -1,11 +1,12 @@
 .container {
     display: flex;
     flex-direction: column;
-    margin: 0 auto;
+    padding: 16px 0;
     justify-content: center;
     align-items: center;
     color: whitesmoke;
-    height: 100vh;
+    min-height: 100vh;
+    padding-top: calc(var(--header-height) + 16px);
 }
 
 .background {
