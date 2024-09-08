@@ -7,17 +7,21 @@ import { UserProvider } from "@auth0/nextjs-auth0/client";
 import Header from '@/components/Header';
 import HomeStyles from '@/styles/home.module.css'
 import { IconMail, IconBrandGithub } from '@tabler/icons-react';
+import { getSession } from '@auth0/nextjs-auth0';
 
 export const metadata: Metadata = {
   title: "My Frame",
   description: "사진을 등록하고 슬라이드를 볼 수 있는 서비스입니다.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
+  const user = session?.user;
+  
   return (
     <html lang="ko">
       <head>
@@ -27,7 +31,9 @@ export default function RootLayout({
         <body>
           <MantineProvider>
             <Header fixed={true} />
-            {children}
+            <main className={`${HomeStyles.container} ${!user ? HomeStyles.background : ''}`}>
+              {children}
+            </main>
             <footer className={HomeStyles.footer}>
               <div>
                 <p>사진을 공유할 수 있는 소셜 플랫폼 <b className={HomeStyles.bold}>MY FRAME</b></p>
