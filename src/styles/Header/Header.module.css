@@ -1,7 +1,7 @@
 .header {
     top: 0;
     height: var(--header-height);
-    background-color: #0000006f;
+    background-color: #000000dc;
     width: 100%;
     color: whitesmoke;
     z-index: 99;
