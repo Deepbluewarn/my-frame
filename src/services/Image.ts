@@ -32,11 +32,11 @@ export async function getImageById(_id: Types.ObjectId) {
     return (await getImage({ _id }))[0];
 }
 
-export async function getAllImagesByOwner(owner: string) {
+export async function getAllImagesByOwner(owner: Types.ObjectId) {
     return await Image.find({ owner });
 }
 
-export async function getRecentImagesByOwner(owner: string, limit: number) {
+export async function getRecentImagesByOwner(owner: Types.ObjectId, limit: number) {
     return (await Image.find({ owner }).sort({ createdAt: -1 }).limit(limit));
 }
 

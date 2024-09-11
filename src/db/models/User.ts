@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Types, Document, Model } from 'mongoose';
 import { ImageInterface } from '@/interface/Upload';
 
 // 회원 인터페이스 정의
@@ -11,8 +11,8 @@ export interface UserInterface {
     createdAt?: Date;
     updatedAt?: Date;
     images?: ImageInterface[];
-    followers?: mongoose.Schema.Types.ObjectId[];
-    following?: mongoose.Schema.Types.ObjectId[];
+    followers?: Types.ObjectId[];
+    following?: Types.ObjectId[];
     socialLinks?: {
         facebook?: string;
         twitter?: string;
@@ -32,9 +32,9 @@ const UserSchema: Schema = new Schema<UserInterface, UserModel>({
     bio: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    images: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Image' }], 
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    images: [{ type: Schema.Types.ObjectId, ref: 'Image' }], 
+    followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     socialLinks: {
         facebook: { type: String },
         twitter: { type: String },

@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema } from 'mongoose';
+import mongoose, { Model, Schema, Types } from 'mongoose';
 
 // 이미지 인터페이스 정의
 export interface ImageInterface {
@@ -8,11 +8,11 @@ export interface ImageInterface {
     title: string;
     description: string;
     tags: string[];
-    owner: mongoose.Schema.Types.ObjectId;
+    owner: Types.ObjectId;
     uploadedAt: Date;
     likes?: number;
     comments?: {
-        userId: mongoose.Schema.Types.ObjectId;
+        userId: Types.ObjectId;
         username: string;
         text: string;
         createdAt: Date;
@@ -30,12 +30,12 @@ export const ImageSchema: Schema = new Schema<ImageInterface, ImageModel>({
     title: { type: String, required: true },
     description: { type: String, required: true },
     tags: { type: [String], required: true },
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     uploadedAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },
     comments: [
         {
-            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+            userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
             username: { type: String, required: true },
             text: { type: String, required: true },
             createdAt: { type: Date, default: Date.now }
