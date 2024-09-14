@@ -1,45 +1,76 @@
-import Image, { ImageInterface } from "@/db/models/Image";
+'use server'
+
+import dbConnect from "@/db/init";
+import Image, { SerializedImageInterface, ImageInterface } from "@/db/models/Image";
 import { UserInterface } from "@/db/models/User";
 import { HydratedDocument, Types } from "mongoose";
+import { userLookupPipeline } from "./User";
 
-interface ImageWithOwner extends ImageInterface {
+const convertIdPipeline = [
+    {
+        $addFields: {
+            id: { $toString: '$_id' },
+            owner: {$toString: '$owner'},
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+        }
+    },
+]
+
+export interface ImageWithOwner extends SerializedImageInterface {
     ownerDetails: UserInterface;
 }
 
 export async function createImage(image: ImageInterface) {
+    await dbConnect();
     const img: HydratedDocument<ImageInterface> = new Image(image);
     return img.save();
 }
 
-export async function getImage($match: { [key: string]: any }) {
+async function getImage($match: { [key: string]: Types.ObjectId }) {
+    await dbConnect();
+
     return await Image.aggregate<ImageWithOwner>([
         { $match },
-        {
-            $lookup: {
-                from: 'users', // 참조할 컬렉션 이름
-                localField: 'owner', // Image 컬렉션의 필드
-                foreignField: '_id', // User 컬렉션의 필드
-                as: 'ownerDetails' // 결과를 저장할 필드 이름
-            }
-        },
-        {
-            $unwind: '$ownerDetails' // 배열을 개별 문서로 펼침
-        }
+        ...userLookupPipeline,
+        ...convertIdPipeline,
     ]);
 }
 
 export async function getImageById(_id: Types.ObjectId) {
-    return (await getImage({ _id }))[0];
+    await dbConnect();
+
+    return (await getImage({ _id: new Types.ObjectId(_id) }))[0];
+}
+
+export async function getNextImagesById({ _id, limit = 1 }: {_id: Types.ObjectId, limit?: number}) {
+    await dbConnect();
+
+    return await Image.aggregate<ImageWithOwner>([
+        {
+            $match: { _id: { $gt: new Types.ObjectId(_id) }}
+        }, {
+            $limit: limit
+        },
+        ...userLookupPipeline,
+        ...convertIdPipeline,
+    ])
 }
 
 export async function getAllImagesByOwner(owner: Types.ObjectId) {
-    return await Image.find({ owner });
+    await dbConnect();
+    return await Image.find({ owner: new Types.ObjectId(owner) });
 }
 
 export async function getRecentImagesByOwner(owner: Types.ObjectId, limit: number) {
-    return (await Image.find({ owner }).sort({ createdAt: -1 }).limit(limit));
+    await dbConnect();
+    return (await Image.find({ owner: new Types.ObjectId(owner) }).sort({ createdAt: -1 }).limit(limit));
 }
 
 export async function getRecentPublicImages(limit: number) {
+    await dbConnect();
     return (await Image.find({ visibility: 'public' }).sort({ createdAt: -1 }).limit(limit));
 }

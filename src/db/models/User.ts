@@ -1,5 +1,6 @@
-import mongoose, { Schema, Types, Document, Model } from 'mongoose';
+import mongoose, { Schema, Types, Model } from 'mongoose';
 import { ImageInterface } from '@/interface/Upload';
+import { SerializedImageInterface } from './Image';
 
 // 회원 인터페이스 정의
 export interface UserInterface {
@@ -21,6 +22,12 @@ export interface UserInterface {
     };
 }
 
+// 직렬화 가능한 타입으로 구성
+export interface SerializedUserInterface extends Omit<UserInterface, 'images' | 'followers' | 'following'> {
+    images: SerializedImageInterface[];
+    followers: string[];
+    following: string[];
+}
 type UserModel = Model<UserInterface>;
 
 // 회원 스키마 정의

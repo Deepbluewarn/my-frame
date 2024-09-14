@@ -1,5 +1,16 @@
 import mongoose, { Model, Schema, Types } from 'mongoose';
 
+export interface IComment {
+    userId: Types.ObjectId;
+    username: string;
+    text: string;
+    createdAt: Date;
+}
+
+export interface ISerializedComment extends Omit<IComment, 'userId'> {
+    userId: string;
+}
+
 // 이미지 인터페이스 정의
 export interface ImageInterface {
     url: string;
@@ -11,13 +22,16 @@ export interface ImageInterface {
     owner: Types.ObjectId;
     uploadedAt: Date;
     likes?: number;
-    comments?: {
-        userId: Types.ObjectId;
-        username: string;
-        text: string;
-        createdAt: Date;
-    }[];
+    comments?: IComment[];
     visibility: 'public' | 'follow' | 'private';
+}
+
+// Aggregate 메소드로 생성된 객체를 위한 인터페이스, 직렬화 가능한 타입으로 구성.
+// service 함수를 server action으로 바로 사용하려면 반환 값이 직렬화 가능해야 함.
+export interface SerializedImageInterface extends Omit<ImageInterface, 'id' | 'owner' | 'comments'> {
+    id: string;
+    owner: string;
+    comments: ISerializedComment[];
 }
 
 type ImageModel = Model<ImageInterface>;
