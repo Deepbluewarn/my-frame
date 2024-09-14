@@ -15,7 +15,7 @@
 
 * Next.js 14
 * MongoDB
-* S3 Buckit
+* S3 Bucket
 * Auth0
 * mantine
 
