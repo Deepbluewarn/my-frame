@@ -53,7 +53,7 @@ export const UploadAction = async (metadata: ImageInterface[] | null, data: Form
     for (const e of metadata) {
         const fileObject = Array.from(data.entries()).find(([key, file]) => {
             if (file instanceof File) {
-                return e.originalFileName === key;
+                return e.originalFileName === decodeURIComponent(key);
             }
         });
         const metadata = e as MetaFileInterface;

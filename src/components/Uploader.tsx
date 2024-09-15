@@ -76,7 +76,7 @@ export default function Uploader() {
         const data = new FormData();
 
         for (const file of Array.from(fileInput.files)) {
-            data.append(file.name, file);
+            data.append(encodeURIComponent(file.name), file);
         }
         const res = await uploadActionWithMatadata(data);
 
