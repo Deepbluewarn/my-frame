@@ -4,7 +4,7 @@
 }
 
 .sidebar {
-    margin: 16px 0 16px 16px;
+    margin: 16px;
     padding: 16px;
     flex: 0 0 15rem;
     max-width: 15rem;
