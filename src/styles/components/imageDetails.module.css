@@ -1,0 +1,46 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.image_container {
+    display: flex;
+    position: relative;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    background-color: #212121;
+    padding: 32px 20px;
+    max-height: 50rem;
+}
+
+.nav_btns {
+    border-radius: 100%;
+}
+
+.image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.detail_container {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 16px;
+}
+
+.list_divider {
+    margin: 16px;
+}
+
+@media (max-width: 768px) {
+    .detail_container {
+        flex-direction: column;
+    }
+}

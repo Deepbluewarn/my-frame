@@ -60,6 +60,61 @@ export async function getNextImagesById({ _id, limit = 1 }: {_id: Types.ObjectId
     ])
 }
 
+export async function getPrevImagesById({ _id, limit = 1 }: {_id: Types.ObjectId, limit?: number}) {
+    await dbConnect();
+
+    return await Image.aggregate<ImageWithOwner>([
+        {
+            $match: { _id: { $lt: new Types.ObjectId(_id) }}
+        }, 
+        {
+            $sort: { _id: -1 }
+        },
+        {
+            $limit: limit
+        },
+        ...userLookupPipeline,
+        ...convertIdPipeline,
+    ])
+}
+
+export async function getSurroundingImagesById(_id: Types.ObjectId, radius: number) {
+    await dbConnect();
+
+    return await Image.aggregate<ImageWithOwner>([
+        {
+            $match: { _id: { $gte: new Types.ObjectId(_id) }}
+        },
+        {
+            $sort: { _id: 1 }
+        },
+        {
+            $limit: radius + 1
+        },
+        {
+            $unionWith: {
+                coll: 'images',
+                pipeline: [
+                    {
+                        $match: { _id: { $lt: new Types.ObjectId(_id) }}
+                    },
+                    {
+                        $sort: { _id: -1 }
+                    },
+                    {
+                        $limit: radius
+                    }
+                ]
+            }
+        },
+        {
+            $sort: { _id: 1 }
+        },
+        ...userLookupPipeline,
+        ...convertIdPipeline,
+    ]);
+}
+
 export async function getAllImagesByOwner(owner: Types.ObjectId) {
     await dbConnect();
     return await Image.find({ owner: new Types.ObjectId(owner) });
