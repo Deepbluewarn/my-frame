@@ -82,6 +82,7 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                                         <Pill
                                             withRemoveButton
                                             onRemove={() => console.log('remove')}
+                                            key={tag}
                                         >
                                             {tag}
                                         </Pill>
