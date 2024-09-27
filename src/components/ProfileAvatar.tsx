@@ -1,6 +1,35 @@
 'use server'
 
 import dbConnect from "@/db/init";
+import Image, { ImageInterface } from "@/db/models/Image";
+import { HydratedDocument } from "mongoose";
+import { ownerLookupPipeline } from "./User";
+
+const convertIdPipeline = [
+    {
+        $addFields: {
+            id: { $toString: '$_id' },
+            owner: {$toString: '$owner'},
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+        }
+    },
+]
+
+
+export async function createImage(image: ImageInterface) {
+    await dbConnect();
+    const img: HydratedDocument<ImageInterface> = new Image(image);
+    return img.save();
+}
+
+async function getImage($match: { [key: string]: string }) {
+'use server'
+
+import dbConnect from "@/db/init";
 import Image, { SerializedImageInterface, ImageInterface } from "@/db/models/Image";
 import { UserInterface } from "@/db/models/User";
 import { HydratedDocument, Types } from "mongoose";

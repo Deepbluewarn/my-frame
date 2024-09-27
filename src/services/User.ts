@@ -60,7 +60,7 @@ export async function updateUserBySub(sub: string, updatedUserData: Partial<User
     return updatedUser;
 }
 
-export async function addImageToUser(sub: string, imageId: Types.ObjectId) {
+export async function addImageToUser(sub: string, imageId: string) {
     await User.findOneAndUpdate(
         { sub },
         { $push: { images: imageId } }

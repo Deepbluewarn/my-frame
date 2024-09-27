@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import { UserInterface } from "@/db/models/User";
 import { createUser, getUserBySub, updateUserBySub } from "@/services/User";
 import { decodeJwt } from "@/utils/jwt";
@@ -26,6 +27,7 @@ export default async function Landing({
     const profilePicture = payload!.picture;
 
     const userData: UserInterface = {
+        _id: (new Types.ObjectId).toString(),
         sub, username, email, profilePicture,
     };
 

@@ -1,9 +1,9 @@
 import mongoose, { Schema, Types, Model } from 'mongoose';
 import { ImageInterface } from '@/interface/Upload';
-import { SerializedImageInterface } from './Image';
 
 // 회원 인터페이스 정의
 export interface UserInterface {
+    _id: string;
     sub: string;
     username: string;
     email: string;
@@ -12,8 +12,8 @@ export interface UserInterface {
     createdAt?: Date;
     updatedAt?: Date;
     images?: ImageInterface[];
-    followers?: Types.ObjectId[];
-    following?: Types.ObjectId[];
+    followers?: string[];
+    following?: string[];
     socialLinks?: {
         facebook?: string;
         twitter?: string;
@@ -22,16 +22,11 @@ export interface UserInterface {
     };
 }
 
-// 직렬화 가능한 타입으로 구성
-export interface SerializedUserInterface extends Omit<UserInterface, 'images' | 'followers' | 'following'> {
-    images: SerializedImageInterface[];
-    followers: string[];
-    following: string[];
-}
 type UserModel = Model<UserInterface>;
 
 // 회원 스키마 정의
 const UserSchema: Schema = new Schema<UserInterface, UserModel>({
+    _id: { type: String, required: true, unique: true},
     sub: { type: String, required: true, unique: true},
     username: { type: String, required: true, unique: true },
     email: { type: String, unique: true },
@@ -39,9 +34,9 @@ const UserSchema: Schema = new Schema<UserInterface, UserModel>({
     bio: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    images: [{ type: Schema.Types.ObjectId, ref: 'Image' }], 
-    followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    following: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    images: [{ type: String, ref: 'Image' }], 
+    followers: [{ type: String, ref: 'User' }],
+    following: [{ type: String, ref: 'User' }],
     socialLinks: {
         facebook: { type: String },
         twitter: { type: String },

@@ -7,6 +7,7 @@ import { createImage } from "@/services/Image";
 import { getImageDimensions } from "@/utils/file";
 import { addImageToUser, getUserBySub } from "@/services/User";
 import connectDB from '@/db/init';
+import { Types } from "mongoose";
 
 // AWS S3 설정
 const s3 = new S3({
@@ -80,6 +81,7 @@ export const UploadAction = async (metadata: ImageInterface[] | null, data: Form
             if (!url) throw new Error('Failed to upload image to S3');
     
             const savedImage = await createImage({
+                _id: (new Types.ObjectId).toString(),
                 url,
                 width: metaFile.width,
                 height: metaFile.height,
