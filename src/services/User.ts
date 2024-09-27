@@ -24,7 +24,8 @@ const projectUserInfo = [
     }
 ]
 
-export const userLookupPipeline = [
+// 이미지 문서의 owner 속성 populate
+export const ownerLookupPipeline = [
     {
         $lookup: {
             from: 'users', // 참조할 컬렉션 이름
@@ -42,6 +43,33 @@ export const userLookupPipeline = [
     }
 ]
 
+export const userLookupPipeline = [
+    {
+        $lookup: {
+            from: 'users', // 참조할 컬렉션 이름
+            localField: 'followers', // Image 컬렉션의 필드
+            foreignField: '_id', // User 컬렉션의 필드
+            as: 'followerUsers', // 결과를 저장할 필드 이름
+            pipeline: [
+                ...convertIdPipeline,
+                ...projectUserInfo,
+            ]
+        }
+    },
+    {
+        $lookup: {
+            from: 'users', // 참조할 컬렉션 이름
+            localField: 'following', // Image 컬렉션의 필드
+            foreignField: '_id', // User 컬렉션의 필드
+            as: 'followingUsers', // 결과를 저장할 필드 이름
+            pipeline: [
+                ...convertIdPipeline,
+                ...projectUserInfo,
+            ]
+        }
+    },
+]
+
 export function getUserBySub(sub: string) {
     return User.findOne({ sub })
 }
@@ -49,6 +77,15 @@ export function getUserBySub(sub: string) {
 export async function createUser(user: UserInterface) {
     const newUser: HydratedDocument<UserInterface> = new User(user);
     return newUser.save();
+}
+
+export async function getUserInfoWithFollow(_id: string) {
+    return await User.aggregate([
+        {
+            $match: { _id }
+        },
+        ...userLookupPipeline
+    ])
 }
 
 export async function updateUserBySub(sub: string, updatedUserData: Partial<UserInterface>) {

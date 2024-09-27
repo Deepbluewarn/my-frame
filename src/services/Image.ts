@@ -1,10 +1,9 @@
 'use server'
 
 import dbConnect from "@/db/init";
-import Image, { SerializedImageInterface, ImageInterface } from "@/db/models/Image";
-import { UserInterface } from "@/db/models/User";
-import { HydratedDocument, Types } from "mongoose";
-import { userLookupPipeline } from "./User";
+import Image, { ImageInterface } from "@/db/models/Image";
+import { HydratedDocument } from "mongoose";
+import { ownerLookupPipeline } from "./User";
 
 const convertIdPipeline = [
     {
@@ -20,9 +19,6 @@ const convertIdPipeline = [
     },
 ]
 
-export interface ImageWithOwner extends SerializedImageInterface {
-    ownerDetails: UserInterface;
-}
 
 export async function createImage(image: ImageInterface) {
     await dbConnect();
@@ -33,9 +29,9 @@ export async function createImage(image: ImageInterface) {
 async function getImage($match: { [key: string]: string }) {
     await dbConnect();
 
-    return await Image.aggregate<ImageWithOwner>([
+    return await Image.aggregate<ImageInterface>([
         { $match },
-        ...userLookupPipeline,
+        ...ownerLookupPipeline,
         ...convertIdPipeline,
     ]);
 }
@@ -55,7 +51,7 @@ export async function getNextImagesById({ _id, limit = 1 }: {_id: string, limit?
         }, {
             $limit: limit
         },
-        ...userLookupPipeline,
+        ...ownerLookupPipeline,
         ...convertIdPipeline,
     ])
 }
@@ -63,7 +59,7 @@ export async function getNextImagesById({ _id, limit = 1 }: {_id: string, limit?
 export async function getPrevImagesById({ _id, limit = 1 }: {_id: string, limit?: number}) {
     await dbConnect();
 
-    return await Image.aggregate<ImageWithOwner>([
+    return await Image.aggregate<ImageInterface>([
         {
             $match: { _id: { $lt: _id }}
         }, 
@@ -73,7 +69,7 @@ export async function getPrevImagesById({ _id, limit = 1 }: {_id: string, limit?
         {
             $limit: limit
         },
-        ...userLookupPipeline,
+        ...ownerLookupPipeline,
         ...convertIdPipeline,
     ])
 }
@@ -110,7 +106,7 @@ export async function getSurroundingImagesById(_id: string, radius: number) {
         {
             $sort: { _id: 1 }
         },
-        ...userLookupPipeline,
+        ...ownerLookupPipeline,
         ...convertIdPipeline,
     ]);
 }
@@ -127,5 +123,12 @@ export async function getRecentImagesByOwner(owner: string, limit: number) {
 
 export async function getRecentPublicImages(limit: number, lastItemId?: string) {
     await dbConnect();
-    return (await Image.find({ visibility: 'public' }).sort({ createdAt: -1 }).limit(limit));
+
+    const query: any = { visibility: 'public' };
+
+    if (lastItemId) {
+        query._id = { $gt: lastItemId };
+    }
+
+    return await Image.find(query).sort({ createdAt: -1 }).limit(limit).lean();
 }
