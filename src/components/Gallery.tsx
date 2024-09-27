@@ -1,10 +1,19 @@
-import { IGalleryFrame } from "@/interface/GalleryFrame";
+'use client'
+
 import { Box } from "@mantine/core";
 import Styles from '@/styles/components/Gallery.module.css';
 import Link from "next/link";
 import Image from "next/image";
 
-export default function GalleryComponent({ images }: { images: IGalleryFrame[] }) {
+export interface IGallery {
+    _id: string;
+    url: string;
+    title: string;
+    width: number;
+    height: number;
+}
+
+export default function GalleryComponent({ images }: { images: IGallery[] }) {
 
     return (
         <Box className={Styles.container}>
