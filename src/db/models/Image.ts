@@ -9,7 +9,7 @@ export interface IComment {
 
 // 이미지 인터페이스 정의
 export interface ImageInterface {
-    _id: string;
+    _id?: string;
     url: string;
     width: number;
     height: number;
@@ -27,7 +27,7 @@ type ImageModel = Model<ImageInterface>;
 
 // 이미지 스키마 정의
 export const ImageSchema: Schema = new Schema<ImageInterface, ImageModel>({
-    _id: { type: String, required: true, unique: true },
+    _id: { type: String, default: new Types.ObjectId().toString() },
     url: { type: String, required: true },
     width: { type: Number, required: true },
     height: { type: Number, required: true },

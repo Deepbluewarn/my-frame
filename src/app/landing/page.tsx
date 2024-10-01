@@ -27,7 +27,6 @@ export default async function Landing({
     const profilePicture = payload!.picture;
 
     const userData: UserInterface = {
-        _id: (new Types.ObjectId).toString(),
         sub, username, email, profilePicture,
     };
 

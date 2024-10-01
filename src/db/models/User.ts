@@ -3,7 +3,7 @@ import { ImageInterface } from '@/interface/Upload';
 
 // 회원 인터페이스 정의
 export interface UserInterface {
-    _id: string;
+    _id?: string;
     sub: string;
     username: string;
     email: string;
@@ -26,7 +26,7 @@ type UserModel = Model<UserInterface>;
 
 // 회원 스키마 정의
 const UserSchema: Schema = new Schema<UserInterface, UserModel>({
-    _id: { type: String, required: true, unique: true},
+    _id: { type: String, default: new Types.ObjectId().toString()},
     sub: { type: String, required: true, unique: true},
     username: { type: String, required: true, unique: true },
     email: { type: String, unique: true },
