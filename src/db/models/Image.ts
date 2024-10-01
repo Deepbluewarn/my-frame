@@ -1,5 +1,8 @@
 import mongoose, { Model, Schema, Types } from 'mongoose';
 
+export type Visibility = 'public' | 'follow' | 'private';
+export const visibilityArray: Visibility[] = ['public', 'follow', 'private'];
+
 export interface IComment {
     userId: string;
     username: string;
@@ -20,7 +23,7 @@ export interface ImageInterface {
     uploadedAt: Date;
     likes?: number;
     comments?: IComment[];
-    visibility: 'public' | 'follow' | 'private';
+    visibility: Visibility;
 }
 
 type ImageModel = Model<ImageInterface>;
@@ -45,7 +48,7 @@ export const ImageSchema: Schema = new Schema<ImageInterface, ImageModel>({
             createdAt: { type: Date, default: Date.now }
         }
     ],
-    visibility: { type: String, enum: ['public', 'follow', 'private'], default: 'public' } // visibility 속성 추가
+    visibility: { type: String, enum: visibilityArray, default: 'public' } // visibility 속성 추가
 });
 
 const Image = mongoose.models.Image as ImageModel || mongoose.model<ImageInterface, ImageModel>('Image', ImageSchema);

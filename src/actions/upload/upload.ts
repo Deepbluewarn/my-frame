@@ -85,11 +85,11 @@ export const UploadAction = async (metadata: ImageInterface[] | null, data: Form
                 width: metaFile.width,
                 height: metaFile.height,
                 title: metaFile?.name,
-                description: 'metaFile?.description',
+                description: metaFile.description,
                 tags: Array.from(metaFile?.tags),
                 owner: userDocument._id,
                 uploadedAt: new Date(),
-                visibility: 'public',
+                visibility: metaFile.visibility,
             });
     
             await addImageToUser(user.sub, savedImage._id);

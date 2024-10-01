@@ -2,18 +2,25 @@
 
 import { UploadContext } from '@/context/UploadContext';
 import { ImageInterface } from '@/interface/Upload';
-import { Box, Text, TextInput } from '@mantine/core';
+import { Box, Chip, Flex, Group, Text, TextInput } from '@mantine/core';
 import React, { useContext, useState } from 'react';
 import Styles from '@/styles/components/ImageMetadataEditor.module.css'
 import PotatoChip from './PotatoChip';
+import { Visibility } from '@/db/models/Image';
 
 function findImageFile(targetFileKey: string, images: ImageInterface[]) {
     return images.find(e => e.key === targetFileKey);
 }
 export default function ImageMetadataEditor() {
     const uploadContext = useContext(UploadContext);
-    const { selectedFileKey, imageFiles, updateName, addTags, removeTag } = uploadContext;
+    const { 
+        selectedFileKey, imageFiles, 
+        updateName, addTags, removeTag, 
+        updateDescription, updateVisibility,
+    } = uploadContext;
     const [inputTagStr, setInputTagStr] = useState('');
+    const [description, setDescription] = useState('');
+    const [visibility, setVisivility] = useState('');
 
     if (!imageFiles || selectedFileKey === null) {
         return <Text>이미지를 선택하세요</Text>
@@ -39,6 +46,19 @@ export default function ImageMetadataEditor() {
 
     const onTagRemoveClicked = (content: string) => {
         removeTag(selectedFileKey, content);
+    }
+
+    const onChipClicked = (e: React.MouseEvent<HTMLInputElement>) => {
+        const target = e.currentTarget;
+        updateVisibility(selectedFileKey, target.value as Visibility);
+        setVisivility(target.value);
+    }
+
+    const onImageDescriptionChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const target = e.currentTarget;
+
+        setDescription(target.value)
+        updateDescription(selectedFileKey, target.value);
     }
 
     if (!image) {
@@ -76,6 +96,21 @@ export default function ImageMetadataEditor() {
                 fw={900}
                 className={Styles.title}
             >
+                설명
+            </Text>
+
+            <TextInput
+                description="사진에 대한 설명"
+                placeholder="설명"
+                value={description}
+                onChange={onImageDescriptionChanged}
+            />
+
+            <Text
+                size="sm"
+                fw={900}
+                className={Styles.title}
+            >
                 태그
             </Text>
             {
@@ -90,7 +125,6 @@ export default function ImageMetadataEditor() {
                 )
             }
 
-
             <TextInput
                 description="태그를 입력하세요 (공백으로 구분)"
                 placeholder="태그"
@@ -98,6 +132,30 @@ export default function ImageMetadataEditor() {
                 onChange={(e) => setInputTagStr(e.target.value)}
                 onKeyDown={onImageTagEnter}
             />
+
+            <Text
+                size="sm"
+                fw={900}
+                className={Styles.title}
+            >
+                공개 범위
+            </Text>
+
+            <Flex gap={2}>
+                <Chip.Group multiple={false} value={visibility} onChange={setVisivility}>
+                    <Group>
+                        <Chip value="public" onClick={(e) => {}}>
+                            전체 공개
+                        </Chip>
+                        <Chip value="follow" onClick={onChipClicked}>
+                            친구 공개
+                        </Chip>
+                        <Chip value="private" onClick={onChipClicked}>
+                            비공개
+                        </Chip>
+                    </Group>
+                </Chip.Group>
+            </Flex>
         </>
     )
 }

@@ -27,6 +27,8 @@ export default function Uploader() {
                 objectURL: URL.createObjectURL(e),
                 name: e.name,
                 tags: new Set(),
+                description: '',
+                visibility: 'public',
                 size: formatFileSize(e.size),
             }
         })

@@ -1,3 +1,4 @@
+import { Visibility } from "@/db/models/Image";
 import { ImageInterface } from "@/interface/Upload";
 import React, { createContext, Dispatch, SetStateAction, useState } from "react";
 
@@ -9,6 +10,8 @@ interface UploadContext {
     addTags: (fileKey: string, newTags: string[]) => void
     removeTag: (fileKey: string, targetTag: string) => void
     updateName: (fileKey: string, newName: string) => void,
+    updateDescription: (fileKey: string, value: string) => void,
+    updateVisibility: (fileKey: string, value: Visibility) => void,
 }
 
 const defaultUploadContext: UploadContext = {
@@ -19,6 +22,8 @@ const defaultUploadContext: UploadContext = {
     addTags: () => {},
     removeTag: () => {},
     updateName: () => {},
+    updateDescription: () => {},
+    updateVisibility: () => {},
 };
 
 export const UploadContext = createContext(defaultUploadContext);
@@ -27,24 +32,26 @@ export const UploadProvider = ({children}: {children: React.ReactNode}) => {
     const [imageFiles, setImageFiles] = useState<ImageInterface[] | null>(null);
     const [selectedFileKey, setSelectedFileKey] = useState<string | null>(null); // 파일 이름으로 선택
 
-    const updateName = (fileKey: string, newName: string) => {
+    const updateImageFiles = (update: (newValues: ImageInterface[]) => ImageInterface[]) => {
         setImageFiles(prev => {
             if (!prev) return prev;
 
-            prev = prev.map(e=> {
+            return update(prev);
+        })
+    }
+
+    const updateName = (fileKey: string, newName: string) => {
+        updateImageFiles((newValue) => {
+            return newValue.map(e=> {
                 e.name = e.key === fileKey ? newName : e.name
 
                 return e;
             })
-
-            return prev;
         })
     }
     const addTags = (fileKey: string, newTags: string[]) => {
-        setImageFiles(prev => {
-            if (!prev) return prev;
-
-            prev = prev.map(e=> {
+        updateImageFiles((newValue) => {
+            return newValue.map(e=> {
                 if (e.key !== fileKey) return e;
 
                 const currentTags = new Set(e.tags);
@@ -55,16 +62,12 @@ export const UploadProvider = ({children}: {children: React.ReactNode}) => {
 
                 return e;
             })
-
-            return prev;
         })
     }
 
     const removeTag = (fileKey: string, targetTag: string) => {
-        setImageFiles(prev => {
-            if (!prev) return prev;
-
-            prev = prev.map(e=> {
+        updateImageFiles((newValue) => {
+            return newValue.map(e=> {
                 if (e.key !== fileKey) return e;
 
                 const newTags = new Set(e.tags);
@@ -73,8 +76,29 @@ export const UploadProvider = ({children}: {children: React.ReactNode}) => {
 
                 return e;
             })
+        })
+    }
 
-            return prev;
+    const updateDescription = (fileKey: string, newDescription: string) => {
+        updateImageFiles((newValue) => {
+            return newValue.map(e=> {
+                if (e.key !== fileKey) return e;
+
+                e.description = e.key === fileKey ? newDescription : e.description;
+
+                return e;
+            })
+        })
+    };
+    const updateVisibility = (fileKey: string, newVisibility: Visibility) => {
+        updateImageFiles((newValue) => {
+            return newValue.map(e=> {
+                if (e.key !== fileKey) return e;
+
+                e.visibility = e.key === fileKey ? newVisibility : e.visibility;
+
+                return e;
+            })
         })
     }
 
@@ -82,6 +106,7 @@ export const UploadProvider = ({children}: {children: React.ReactNode}) => {
         imageFiles, setImageFiles,
         selectedFileKey, setSelectedFileKey,
         addTags, removeTag, updateName,
+        updateDescription, updateVisibility
     }
 
     return (
