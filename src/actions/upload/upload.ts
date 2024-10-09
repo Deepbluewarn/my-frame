@@ -81,6 +81,7 @@ export const UploadAction = async (metadata: ImageInterface[] | null, data: Form
             if (!url) throw new Error('Failed to upload image to S3');
     
             const savedImage = await createImage({
+                _id: new Types.ObjectId().toString(),
                 url,
                 width: metaFile.width,
                 height: metaFile.height,
