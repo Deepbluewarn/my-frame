@@ -1,3 +1,4 @@
+import dbConnect from "@/db/init";
 import User, { UserInterface } from "@/db/models/User";
 import { HydratedDocument } from "mongoose";
 
@@ -35,16 +36,19 @@ export const userLookupPipeline = [
     },
 ]
 
-export function getUserBySub(sub: string) {
+export async function getUserBySub(sub: string) {
+    await dbConnect();
     return User.findOne({ sub })
 }
 
 export async function createUser(user: UserInterface) {
+    await dbConnect();
     const newUser: HydratedDocument<UserInterface> = new User(user);
     return newUser.save();
 }
 
 export async function getUserInfoWithFollow(_id: string) {
+    await dbConnect();
     return await User.aggregate([
         {
             $match: { _id }
@@ -54,6 +58,7 @@ export async function getUserInfoWithFollow(_id: string) {
 }
 
 export async function updateUserBySub(sub: string, updatedUserData: Partial<UserInterface>) {
+    await dbConnect();
     const updatedUser = await User.findOneAndUpdate(
         { sub },
         { $set: updatedUserData },
@@ -63,6 +68,7 @@ export async function updateUserBySub(sub: string, updatedUserData: Partial<User
 }
 
 export async function addImageToUser(sub: string, imageId: string) {
+    await dbConnect();
     await User.findOneAndUpdate(
         { sub },
         { $push: { images: imageId } }
@@ -70,5 +76,6 @@ export async function addImageToUser(sub: string, imageId: string) {
 }
 
 export async function deleteUserBySub(sub: string) {
+    await dbConnect();
     await User.deleteOne({ sub });
 }
