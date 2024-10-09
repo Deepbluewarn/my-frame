@@ -1,10 +1,9 @@
 import {
     actionGetNextImagesById,
     actionGetPrevImagesById,
-    actionGetSurroundingImagesById
 } from "@/actions/image";
 import { ImageWithOwner } from "@/services/Image";
-import { usePathname, notFound } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface ImageWithOwnerPagination extends ImageWithOwner {
@@ -45,12 +44,9 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         setCurrentImgId(use_pathname.split('/')[2])
     }, [use_pathname])
 
-    // App router Shallow Routing 구현
-    // https://github.com/vercel/next.js/discussions/18072
     const updateHistory = (imageId: string) => {
         const url = `/image/${imageId}`
-        window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url);
-        setCurrentImgId(imageId)
+        window.history.pushState(null, '', url)
     }
 
     const current = imageCache.get(currentImgId);
@@ -64,7 +60,6 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         if (!currentImage) return;
 
         if (currentImage.next) {
-            // setCurrentImgId(currentImage.next);
             updateHistory(currentImage.next)
         }
 
@@ -117,7 +112,7 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         if (!newImage || newImage.length <= 0) return;
 
         setImageCache(m => {
-            const lastKey = Array.from(m.keys()).pop();
+            const lastKey = Array.from(m.keys()).sort()[m.size - 1];
             const lastImage = m.get(lastKey!);
             const pgImage = newImage[0] as ImageWithOwnerPagination;
             const res = new Map(m);
