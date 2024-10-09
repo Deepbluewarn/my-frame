@@ -4,7 +4,7 @@ import { Box, Divider } from "@mantine/core";
 import { isValidObjectId } from "mongoose";
 import { notFound } from "next/navigation";
 import Styles from '@/styles/user.module.css';
-import RecentPublicImages from "@/components/Images/RecentPublicImages";
+import RecentImages from "@/components/Images/RecentImages";
 
 export default async function Page({ params }: { params: { _id: string } }) {
     if (!isValidObjectId(params._id)) notFound();
@@ -29,7 +29,7 @@ export default async function Page({ params }: { params: { _id: string } }) {
 
             <Divider />
 
-            <RecentPublicImages userId={params._id}/>
+            <RecentImages userId={params._id}/>
         </>
     )
 }

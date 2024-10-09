@@ -4,21 +4,12 @@ import dbConnect from "@/db/init";
 import Image, { ImageInterface } from "@/db/models/Image";
 import { HydratedDocument } from "mongoose";
 import { ownerLookupPipeline } from "./User";
+import { UserInterface } from "@/db/models/User";
+import { getVisibilityPipeline } from "@/utils/service";
 
-const convertIdPipeline = [
-    {
-        $addFields: {
-            id: { $toString: '$_id' },
-            owner: {$toString: '$owner'},
-        }
-    },
-    {
-        $project: {
-            _id: 0,
-        }
-    },
-]
-
+export interface ImageWithOwner extends ImageInterface {
+    ownerDetails: UserInterface;
+}
 
 export async function createImage(image: ImageInterface) {
     await dbConnect();
@@ -26,42 +17,48 @@ export async function createImage(image: ImageInterface) {
     return img.save();
 }
 
-async function getImage($match: { [key: string]: string }) {
+async function getImage($match: { [key: string]: string }, viewerId?: string) {
     await dbConnect();
 
-    return await Image.aggregate<ImageInterface>([
+    return await Image.aggregate<ImageWithOwner>([
         { $match },
         ...ownerLookupPipeline,
-        ...convertIdPipeline,
+        ...getVisibilityPipeline(viewerId),
     ]);
 }
 
-export async function getImageById(_id: string) {
+export async function getImageById(_id: string, viewerId?: string) {
     await dbConnect();
 
-    return (await getImage({ _id: _id }))[0];
+    return (await getImage({ _id: _id }, viewerId))[0];
 }
 
-export async function getNextImagesById({ _id, limit = 1 }: {_id: string, limit?: number}) {
+export async function getNextImagesById({ _id, viewerId, ownerId, limit = 1 }: {_id: string, viewerId?: string, ownerId:string, limit?: number}) {
     await dbConnect();
 
-    return await Image.aggregate<ImageInterface>([
+    return await Image.aggregate<ImageWithOwner>([
         {
-            $match: { _id: { $gt: _id }}
+            $match: { 
+                _id: { $gt: _id },
+                owner: ownerId
+            },
         }, {
             $limit: limit
         },
         ...ownerLookupPipeline,
-        ...convertIdPipeline,
+        ...getVisibilityPipeline(viewerId),
     ])
 }
 
-export async function getPrevImagesById({ _id, limit = 1 }: {_id: string, limit?: number}) {
+export async function getPrevImagesById({ _id, viewerId, ownerId, limit = 1 }: {_id: string, viewerId?: string, ownerId: string, limit?: number}) {
     await dbConnect();
 
-    return await Image.aggregate<ImageInterface>([
+    return await Image.aggregate<ImageWithOwner>([
         {
-            $match: { _id: { $lt: _id }}
+            $match: { 
+                _id: { $lt: _id },
+                owner: ownerId
+            },
         }, 
         {
             $sort: { _id: -1 }
@@ -70,16 +67,19 @@ export async function getPrevImagesById({ _id, limit = 1 }: {_id: string, limit?
             $limit: limit
         },
         ...ownerLookupPipeline,
-        ...convertIdPipeline,
+        ...getVisibilityPipeline(viewerId),
     ])
 }
 
-export async function getSurroundingImagesById(_id: string, radius: number) {
+export async function getSurroundingImagesById(imageId: string, radius: number, ownerId: string, viewerId?: string) {
     await dbConnect();
 
-    return await Image.aggregate<ImageInterface>([
+    return await Image.aggregate<ImageWithOwner>([
         {
-            $match: { _id: { $gte: _id }}
+            $match: { 
+                _id: { $gte: imageId },
+                owner: ownerId
+            }
         },
         {
             $sort: { _id: 1 }
@@ -92,7 +92,7 @@ export async function getSurroundingImagesById(_id: string, radius: number) {
                 coll: 'images',
                 pipeline: [
                     {
-                        $match: { _id: { $lt: _id }}
+                        $match: { _id: { $lt: imageId }, owner: ownerId}
                     },
                     {
                         $sort: { _id: -1 }
@@ -107,28 +107,31 @@ export async function getSurroundingImagesById(_id: string, radius: number) {
             $sort: { _id: 1 }
         },
         ...ownerLookupPipeline,
-        ...convertIdPipeline,
+        ...getVisibilityPipeline(viewerId),
     ]);
 }
 
-export async function getAllImagesByOwner(owner: string) {
-    await dbConnect();
-    return await Image.find({ owner: owner }).lean();
-}
-
-export async function getRecentImagesByOwner(owner: string, limit: number) {
-    await dbConnect();
-    return (await Image.find({ owner: owner }).sort({ createdAt: -1 }).limit(limit).lean());
-}
-
-export async function getRecentPublicImages(limit: number, lastItemId?: string) {
+/**
+ * 
+ * @param limit 이미지 개수 제한
+ * @param userId 이미지의 owner
+ * @param lastItemId pagination을 위한 마지막 이미지 문서의 _id
+ * @returns ImageWithOwner[]
+ */
+export async function getUserRecentImages(limit: number, userId: string, viewerId?: string, lastItemId?: string) {
     await dbConnect();
 
-    const query: any = { visibility: 'public' };
-
-    if (lastItemId) {
-        query._id = { $gt: lastItemId };
-    }
-
-    return await Image.find(query).sort({ createdAt: -1 }).limit(limit).lean();
+    return await Image.aggregate([
+        {
+            $match: {
+                _id: { $gt: lastItemId },
+                owner: userId,
+            }
+        },
+        ...ownerLookupPipeline,
+        ...getVisibilityPipeline(viewerId),
+        {
+            $limit: limit
+        }
+    ])
 }

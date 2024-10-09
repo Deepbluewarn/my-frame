@@ -1,19 +1,18 @@
 import Styles from '@/styles/components/imageDetails.module.css';
 import { Box } from "@mantine/core";
-import { actionGetSurroundingImagesById } from "@/actions/image";
+import { actionGetImageById, actionGetSurroundingImagesById } from "@/actions/image";
 import ImageDetails from "@/components/ImageDetails";
 import { notFound } from 'next/navigation';
-import { Types } from 'mongoose';
+import { isValidObjectId } from 'mongoose';
 // https://github.com/vercel/next.js/discussions/18072
 // https://medium.com/@moh.mir36/shallow-routing-with-next-js-v13-app-directory-2d765928c340
-export default async function Page({ params }: { params: { _id: string } }) {
+export default async function Page({ params }: { params: { imageId: string } }) {
     // objectId 유효성 확인
-    try {
-        new Types.ObjectId(params._id);
-    } catch(e) {
+    if (!isValidObjectId(params.imageId)) {
         notFound()
     }
-    const images = await actionGetSurroundingImagesById(params._id, 2);
+    
+    const images = await actionGetSurroundingImagesById(params.imageId, 2);
 
     if (!images || images.length === 0) notFound();
 

@@ -3,7 +3,7 @@ import { ImageInterface } from '@/interface/Upload';
 
 // 회원 인터페이스 정의
 export interface UserInterface {
-    _id?: string;
+    _id: string;
     sub: string;
     username: string;
     email: string;

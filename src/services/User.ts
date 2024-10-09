@@ -1,28 +1,5 @@
 import User, { UserInterface } from "@/db/models/User";
-import { Types, HydratedDocument } from "mongoose";
-
-const convertIdPipeline = [
-    {
-        $addFields: {
-            id: { $toString: '$_id' },
-        }
-    },
-    {
-        $project: {
-            _id: 0,
-        }
-    },
-]
-const projectUserInfo = [
-    {
-        // 아래 속성은 ObjectId를 포함하는 배열이기 때문에 직렬화 불가능.
-        $project: {
-            images: 0,
-            followers: 0,
-            following: 0,
-        }
-    }
-]
+import { HydratedDocument } from "mongoose";
 
 // 이미지 문서의 owner 속성 populate
 export const ownerLookupPipeline = [
@@ -32,10 +9,6 @@ export const ownerLookupPipeline = [
             localField: 'owner', // Image 컬렉션의 필드
             foreignField: '_id', // User 컬렉션의 필드
             as: 'ownerDetails', // 결과를 저장할 필드 이름
-            pipeline: [
-                ...convertIdPipeline,
-                ...projectUserInfo,
-            ]
         }
     },
     {
@@ -50,10 +23,6 @@ export const userLookupPipeline = [
             localField: 'followers', // Image 컬렉션의 필드
             foreignField: '_id', // User 컬렉션의 필드
             as: 'followerUsers', // 결과를 저장할 필드 이름
-            pipeline: [
-                ...convertIdPipeline,
-                ...projectUserInfo,
-            ]
         }
     },
     {
@@ -62,10 +31,6 @@ export const userLookupPipeline = [
             localField: 'following', // Image 컬렉션의 필드
             foreignField: '_id', // User 컬렉션의 필드
             as: 'followingUsers', // 결과를 저장할 필드 이름
-            pipeline: [
-                ...convertIdPipeline,
-                ...projectUserInfo,
-            ]
         }
     },
 ]

@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from "react";
 import GalleryComponent, { IGallery } from "../Gallery";
-import { actionGetRecentPublicImages } from "@/actions/image";
+import { actionGetUserRecentImages } from "@/actions/image";
 
-export default function RecentPublicImages({ userId } : { userId: string }) {
+export default function RecentImages({ userId } : { userId: string }) {
     const [ images, setImages ] = useState<IGallery[]>([]);
 
     useEffect(() => {
         const asyncFn = async () => {
-            const userPublicPics = await actionGetRecentPublicImages(10, userId)
+            const pics = await actionGetUserRecentImages(10, userId)
 
-            const galleryImages: IGallery[] = userPublicPics.map(img => {
+            const galleryImages: IGallery[] = pics.map(img => {
                 return {
                     _id: img._id.toString(),
                     url: img.url,

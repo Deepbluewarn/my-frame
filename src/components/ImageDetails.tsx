@@ -13,8 +13,6 @@ import {
 import { IconCircleChevronLeft, IconCircleChevronRight } from "@tabler/icons-react";
 
 export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
-    console.log('ImageDetails: ', images)
-
     const { next, prev, list, current, loading } = useImageList(images);
 
     const onNextClicked = useCallback(async () => {

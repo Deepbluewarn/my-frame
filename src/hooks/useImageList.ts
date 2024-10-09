@@ -26,8 +26,8 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         const pageImages = initImages.map((v, i) => {
             const pg = v as ImageWithOwnerPagination;
 
-            pg.prev = i <= 0 ? null : initImages[i - 1].id;
-            pg.next = i >= initImages.length - 1 ? null : initImages[i + 1].id
+            pg.prev = i <= 0 ? null : initImages[i - 1]._id;
+            pg.next = i >= initImages.length - 1 ? null : initImages[i + 1]._id
 
             return pg;
         })
@@ -35,7 +35,7 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         setImageCache(m => {
             const res = new Map(m);
             pageImages.forEach(e => {
-                res.set(e.id, e);
+                res.set(e._id, e);
             });
             return res;
         })
@@ -59,7 +59,7 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         setLoading(true);
 
         const currentImage = imageCache.get(currentImgId);
-        const lastImgId = getLastImage()?.id;
+        const lastImgId = getLastImage()?._id;
 
         if (!currentImage) return;
 
@@ -68,7 +68,7 @@ export default function useImageList(initImages: ImageWithOwner[]) {
             updateHistory(currentImage.next)
         }
 
-        if (!hasImagesWithinRadius(currentImage.id, true) && lastImgId) {
+        if (!hasImagesWithinRadius(currentImage._id, true) && lastImgId) {
             await addNextImage(lastImgId)
         }
         setLoading(false);
@@ -77,14 +77,14 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     const prev = async () => {
         setLoading(true);
         const currentImage = imageCache.get(currentImgId);
-        const firstImgId = getFirstImage()?.id;
+        const firstImgId = getFirstImage()?._id;
 
         if (!currentImage) return;
 
         if (currentImage.prev) {
             updateHistory(currentImage.prev)
         }
-        if (!hasImagesWithinRadius(currentImage.id, false) && firstImgId) {
+        if (!hasImagesWithinRadius(currentImage._id, false) && firstImgId) {
             await addPrevImage(firstImgId)
         }
         setLoading(false);
@@ -124,12 +124,12 @@ export default function useImageList(initImages: ImageWithOwner[]) {
 
             if (!lastImage) return m;
 
-            lastImage.next = pgImage.id;
-            pgImage.prev = lastImage.id;
+            lastImage.next = pgImage._id;
+            pgImage.prev = lastImage._id;
             pgImage.next = null;
 
-            res.set(lastImage.id, lastImage);
-            res.set(pgImage.id, pgImage);
+            res.set(lastImage._id, lastImage);
+            res.set(pgImage._id, pgImage);
 
             return res;
         })
@@ -152,12 +152,12 @@ export default function useImageList(initImages: ImageWithOwner[]) {
 
             if (!firstImage) return m;
 
-            firstImage.prev = pgImage.id;
+            firstImage.prev = pgImage._id;
             pgImage.prev = null;
-            pgImage.next = firstImage.id;
+            pgImage.next = firstImage._id;
 
-            res.set(pgImage.id, pgImage);
-            res.set(firstImage.id, firstImage);
+            res.set(pgImage._id, pgImage);
+            res.set(firstImage._id, firstImage);
 
             return res;
         })

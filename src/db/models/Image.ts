@@ -12,7 +12,7 @@ export interface IComment {
 
 // 이미지 인터페이스 정의
 export interface ImageInterface {
-    _id?: string;
+    _id: string;
     url: string;
     width: number;
     height: number;
