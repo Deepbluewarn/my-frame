@@ -4,7 +4,7 @@ const nextConfig = {
         serverActions: {
             allowedOrigins: [
                 'localhost:3001',
-                '270zvh4l-3001.asse.devtunnels.ms'
+                'wv93m9tn-3001.asse.devtunnels.ms'
             ]
         }
     },
