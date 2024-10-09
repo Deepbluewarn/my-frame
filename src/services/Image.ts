@@ -33,20 +33,21 @@ export async function getImageById(_id: string, viewerId?: string) {
     return (await getImage({ _id: _id }, viewerId))[0];
 }
 
-export async function getNextImagesById({ _id, viewerId, ownerId, limit = 1 }: {_id: string, viewerId?: string, ownerId:string, limit?: number}) {
+export async function getNextImagesById({ _id, viewerId, ownerId, limit = 1 }: {_id: string, viewerId?: string, ownerId: string, limit?: number}) {
     await dbConnect();
 
     return await Image.aggregate<ImageWithOwner>([
+        ...ownerLookupPipeline,
+        ...getVisibilityPipeline(viewerId),
         {
-            $match: { 
+            $match: {
+                owner: ownerId,
                 _id: { $gt: _id },
-                owner: ownerId
             },
         }, {
             $limit: limit
         },
-        ...ownerLookupPipeline,
-        ...getVisibilityPipeline(viewerId),
+        
     ])
 }
 
@@ -54,10 +55,12 @@ export async function getPrevImagesById({ _id, viewerId, ownerId, limit = 1 }: {
     await dbConnect();
 
     return await Image.aggregate<ImageWithOwner>([
+        ...ownerLookupPipeline,
+        ...getVisibilityPipeline(viewerId),
         {
             $match: { 
+                owner: ownerId,
                 _id: { $lt: _id },
-                owner: ownerId
             },
         }, 
         {
@@ -66,8 +69,6 @@ export async function getPrevImagesById({ _id, viewerId, ownerId, limit = 1 }: {
         {
             $limit: limit
         },
-        ...ownerLookupPipeline,
-        ...getVisibilityPipeline(viewerId),
     ])
 }
 
@@ -75,10 +76,12 @@ export async function getSurroundingImagesById(imageId: string, radius: number, 
     await dbConnect();
 
     return await Image.aggregate<ImageWithOwner>([
+        ...ownerLookupPipeline,
+        ...getVisibilityPipeline(viewerId),
         {
             $match: { 
+                owner: ownerId,
                 _id: { $gte: imageId },
-                owner: ownerId
             }
         },
         {
@@ -106,8 +109,6 @@ export async function getSurroundingImagesById(imageId: string, radius: number, 
         {
             $sort: { _id: 1 }
         },
-        ...ownerLookupPipeline,
-        ...getVisibilityPipeline(viewerId),
     ]);
 }
 
@@ -122,14 +123,14 @@ export async function getUserRecentImages(limit: number, userId: string, viewerI
     await dbConnect();
 
     return await Image.aggregate([
+        ...ownerLookupPipeline,
+        ...getVisibilityPipeline(viewerId),
         {
             $match: {
-                _id: { $gt: lastItemId },
+                ...(lastItemId && { _id: { $gt: lastItemId } }),
                 owner: userId,
             }
         },
-        ...ownerLookupPipeline,
-        ...getVisibilityPipeline(viewerId),
         {
             $limit: limit
         }
