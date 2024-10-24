@@ -2,16 +2,18 @@ import Image from 'next/image'
 
 export default function GalleryFrame({
     width, height, url, title, description, tags, likes,
+    className,
 }: {
     width: number, height: number,
     url: string, title: string,
     description: string, tags: string[],
     likes: number,
+    className?: string,
 }) {
   return (
     <>
-      <Image style={{
-        width: '100%', maxHeight: 'inherit', objectFit: 'contain', padding: '32px 8px'
+      <Image className={className} style={{
+        width: '100%', objectFit: 'contain', 
       }} src={url} width={width} height={height} alt={title}/>
     </>
   )

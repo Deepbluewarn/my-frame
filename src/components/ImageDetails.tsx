@@ -11,6 +11,7 @@ import {
     PillsInput, Text, TextInput
 } from "@mantine/core";
 import { IconCircleChevronLeft, IconCircleChevronRight } from "@tabler/icons-react";
+import ImageThumbnailList from "./ImageThumbnailList";
 
 export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
     const { next, prev, list, current, loading } = useImageList(images);
@@ -34,6 +35,7 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                     variant="default"
                     onClick={onPrevClicked}
                     disabled={loading}
+                    className={`${Styles.nav_prev_btn} ${Styles.nav_btn}`}
                 >
                     <IconCircleChevronLeft />
                 </ActionIcon>
@@ -45,14 +47,20 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                     description={current.description}
                     tags={current.tags}
                     likes={current.likes || 0}
+                    className={Styles.image}
                 />
                 <ActionIcon
                     variant="default"
                     onClick={onNextClicked}
                     disabled={loading}
+                    className={`${Styles.nav_next_btn} ${Styles.nav_btn}`}
                 >
                     <IconCircleChevronRight />
                 </ActionIcon>
+
+                <Box className={Styles.image_thumbnail_list}>
+                    <ImageThumbnailList list={list(2)} />
+                </Box>
             </Box>
             <Flex className={Styles.detail_container}>
                 <Flex direction='column' flex='1' className={Styles.detail_left}>
