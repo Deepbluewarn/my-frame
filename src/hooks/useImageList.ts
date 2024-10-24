@@ -6,7 +6,7 @@ import { ImageWithOwner } from "@/services/Image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface ImageWithOwnerPagination extends ImageWithOwner {
+export interface ImageWithOwnerPagination extends ImageWithOwner {
     prev?: string | null;
     next?: string | null;
 }
