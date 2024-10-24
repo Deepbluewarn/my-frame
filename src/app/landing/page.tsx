@@ -38,10 +38,12 @@ export default async function Landing({
             await createUser(userData);
         } else {
             userData.updatedAt = new Date();
+            delete (userData as any)._id;
             await updateUserBySub(sub, userData);
         }
         success = true;
     } catch (e) {
+        console.error('Landing 실패: ', e);
         success = false;
     } finally {
         redirectToContinue(state as string, success);
