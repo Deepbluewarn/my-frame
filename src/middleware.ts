@@ -5,7 +5,7 @@ export default withMiddlewareAuthRequired();
 export const config = {
   matcher: [
     '/upload',
-    '/image', 
+    '/image/:imageId*', 
     '/user'
   ]
 };
