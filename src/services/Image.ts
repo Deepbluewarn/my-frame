@@ -94,6 +94,8 @@ export async function getSurroundingImagesById(imageId: string, radius: number, 
             $unionWith: {
                 coll: 'images',
                 pipeline: [
+                    ...ownerLookupPipeline,
+                    ...getVisibilityPipeline(viewerId),
                     {
                         $match: { _id: { $lt: imageId }, owner: ownerId}
                     },
