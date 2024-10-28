@@ -138,3 +138,21 @@ export async function getUserRecentImages(limit: number, userId: string, viewerI
         }
     ])
 }
+
+export async function addImageTags(imageId: string, tags: string[]) {
+    await dbConnect();
+
+    return await Image.updateOne(
+        { _id: imageId }, 
+        { $addToSet: { tags: { $each: tags } }}
+    )
+}
+
+export async function removeImageTag(imageId: string, tag: string) {
+    await dbConnect();
+
+    return await Image.updateOne(
+        { _id: imageId }, 
+        { $pull: { tags: tag }}
+    )
+}

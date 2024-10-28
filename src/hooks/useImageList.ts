@@ -1,6 +1,8 @@
 import {
+    actionAddImageTags,
     actionGetNextImagesById,
     actionGetPrevImagesById,
+    actionRemoveImageTag,
 } from "@/actions/image";
 import { ImageWithOwner } from "@/services/Image";
 import { usePathname } from "next/navigation";
@@ -106,6 +108,39 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         return res;
     };
 
+    const addTags = async (tagStr: string) => {
+        const tags = tagStr.split(' ');
+
+        actionAddImageTags(currentImgId, tags).then(() => {
+            setImageCache(m => {
+                const res = new Map(m);
+                const image = res.get(currentImgId);
+    
+                if (image) {
+                    image.tags = Array.from(new Set([...image.tags, ...tags]))
+                    res.set(currentImgId, image);
+                }
+    
+                return res;
+            })
+        })
+    }
+
+    const removeTags = (targetTag: string) => {
+        actionRemoveImageTag(currentImgId, targetTag).then(() => {
+            setImageCache(m => {
+                const res = new Map(m);
+                const image = res.get(currentImgId);
+    
+                if (image) {
+                    image.tags = image.tags.filter(v => v !== targetTag)
+                }
+    
+                return res;
+            })
+        })
+    }
+
     const addNextImage = async (lastImgId: string) => {
         const newImage = await actionGetNextImagesById(lastImgId, 1);
 
@@ -190,6 +225,7 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     }
 
     return {
-        next, prev, list, current, loading,
+        next, prev, list, current, loading, 
+        addTags, removeTags,
     }
 }

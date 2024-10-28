@@ -1,11 +1,13 @@
 'use server'
 
 import { 
+    addImageTags,
     getImageById, 
     getNextImagesById, 
     getPrevImagesById, 
     getSurroundingImagesById,
-    getUserRecentImages, 
+    getUserRecentImages,
+    removeImageTag, 
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
 
@@ -36,4 +38,26 @@ export async function actionGetSurroundingImagesById(_id: string, radius: number
     const viewerId = await actionGetUserIdBySub();
     const owner = await actionGetImageById(_id);
     return await getSurroundingImagesById(_id, radius, owner.ownerDetails._id, viewerId);
+}
+
+export async function actionAddImageTags(_id: string, tags: string[]) {
+    const viewerId = await actionGetUserIdBySub();
+    const owner = await actionGetImageById(_id);
+
+    if (viewerId !== owner.ownerDetails._id) {
+        console.log('태그 업데이트 실패. 이미지의 소유자만 태그를 업데이트 할 수 있습니다.')
+    }
+
+    return await addImageTags(_id, tags);
+}
+
+export async function actionRemoveImageTag(_id: string, tag: string) {
+    const viewerId = await actionGetUserIdBySub();
+    const owner = await actionGetImageById(_id);
+
+    if (viewerId !== owner.ownerDetails._id) {
+        console.log('태그 업데이트 실패. 이미지의 소유자만 태그를 업데이트 할 수 있습니다.')
+    }
+
+    return await removeImageTag(_id, tag);
 }

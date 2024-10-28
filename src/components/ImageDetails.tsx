@@ -1,7 +1,7 @@
 'use client'
 
 import { ImageWithOwner } from "@/services/Image";
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import GalleryFrame from "@/components/GalleryFrame";
 import useImageList from "@/hooks/useImageList";
 import Styles from '@/styles/components/imageDetails.module.css';
@@ -14,7 +14,8 @@ import { IconCircleChevronLeft, IconCircleChevronRight } from "@tabler/icons-rea
 import ImageThumbnailList from "./ImageThumbnailList";
 
 export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
-    const { next, prev, list, current, loading } = useImageList(images);
+    const { next, prev, list, current, loading, addTags, removeTags } = useImageList(images);
+    const [tagStrInput, setTagStrInput] = useState('');
 
     const onNextClicked = useCallback(async () => {
         if (loading) return;
@@ -25,6 +26,15 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
         if (loading) return;
         prev()
     }, [prev, loading])
+
+    const onImageTagEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key !== 'Enter') return;
+
+        const target = e.currentTarget;
+
+        addTags(target.value);
+        setTagStrInput('');
+    }
 
     if (!current) return null;
 
@@ -87,14 +97,19 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                                     current.tags.map(tag =>
                                         <Pill
                                             withRemoveButton
-                                            onRemove={() => console.log('remove')}
+                                            onRemove={() => removeTags(tag)}
                                             key={tag}
                                         >
                                             {tag}
                                         </Pill>
                                     )
                                 }
-                                <PillsInput.Field placeholder="태그 추가 (공백으로 구분)" />
+                                <PillsInput.Field 
+                                    value={tagStrInput}
+                                    onChange={(e) => {setTagStrInput(e.target.value)}}
+                                    onKeyDown={onImageTagEnter} 
+                                    placeholder="태그 추가 (공백으로 구분)"
+                                />
                             </PillGroup>
                         </PillsInput>
                     </Box>
@@ -108,13 +123,16 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
 
                     <Divider className={Styles.list_divider}/>
 
-                    <Text>댓글 {current.comments.length}개</Text>
+                    {
+                        current.comments ? (
+                            <>
+                                <Text>댓글 {current.comments.length}개</Text>
 
-                    <Box>
-                        {
-                            current.comments.map(comment => (
-                                <Flex gap={8} align='center'>
-                                    {/* <Avatar
+                                <Box>
+                                    {
+                                        current.comments.map(comment => (
+                                            <Flex gap={8} align='center'>
+                                                {/* <Avatar
                                                     size="md"
                                                     src={comment.user.profilePicture}
                                                     alt={comment.user.username}
@@ -124,10 +142,13 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                                                     <Text fw={700}>{comment.user.username}</Text>
                                                     <Text>{comment.text}</Text>
                                                 </Flex> */}
-                                </Flex>
-                            ))
-                        }
-                    </Box>
+                                            </Flex>
+                                        ))
+                                    }
+                                </Box>
+                            </>
+                        ) : <Text>댓글 0개</Text>
+                    }
 
                     <Divider className={Styles.list_divider}/>
 
