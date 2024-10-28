@@ -19,8 +19,6 @@ export default function ImageMetadataEditor() {
         updateDescription, updateVisibility,
     } = uploadContext;
     const [inputTagStr, setInputTagStr] = useState('');
-    const [description, setDescription] = useState('');
-    const [visibility, setVisivility] = useState('');
 
     if (!imageFiles || selectedFileKey === null) {
         return <Text>이미지를 선택하세요</Text>
@@ -48,16 +46,12 @@ export default function ImageMetadataEditor() {
         removeTag(selectedFileKey, content);
     }
 
-    const onChipClicked = (e: React.MouseEvent<HTMLInputElement>) => {
-        const target = e.currentTarget;
-        updateVisibility(selectedFileKey, target.value as Visibility);
-        setVisivility(target.value);
+    const onChipChanged = (value: string) => {
+        updateVisibility(selectedFileKey, value as Visibility);
     }
 
     const onImageDescriptionChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
         const target = e.currentTarget;
-
-        setDescription(target.value)
         updateDescription(selectedFileKey, target.value);
     }
 
@@ -102,7 +96,7 @@ export default function ImageMetadataEditor() {
             <TextInput
                 description="사진에 대한 설명"
                 placeholder="설명"
-                value={description}
+                value={image.description}
                 onChange={onImageDescriptionChanged}
             />
 
@@ -142,15 +136,15 @@ export default function ImageMetadataEditor() {
             </Text>
 
             <Flex gap={2}>
-                <Chip.Group multiple={false} value={visibility} onChange={setVisivility}>
+                <Chip.Group multiple={false} value={image.visibility} onChange={onChipChanged}>
                     <Group>
-                        <Chip value="public" onClick={(e) => {}}>
+                        <Chip value="public">
                             전체 공개
                         </Chip>
-                        <Chip value="follow" onClick={onChipClicked}>
+                        <Chip value="follow">
                             친구 공개
                         </Chip>
-                        <Chip value="private" onClick={onChipClicked}>
+                        <Chip value="private">
                             비공개
                         </Chip>
                     </Group>
