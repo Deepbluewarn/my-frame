@@ -4,6 +4,7 @@ import {
     actionGetImageComments,
     actionGetNextImagesById,
     actionGetPrevImagesById,
+    actionRemoveImageComment,
     actionRemoveImageTag,
 } from "@/actions/image";
 import { IComment } from "@/db/models/Image";
@@ -165,8 +166,14 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         })
     }
 
-    const removeComment = () => {
+    const removeComment = async (commentId: string) => {
+        const res = await actionRemoveImageComment(currentImgId, commentId);
 
+        if (res) {
+            setComment(comments => {
+                return comments.filter(c => c._id !== commentId)
+            })
+        }
     }
 
     const addNextImage = async (lastImgId: string) => {

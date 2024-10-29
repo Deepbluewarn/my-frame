@@ -9,6 +9,7 @@ import {
     getPrevImagesById, 
     getSurroundingImagesById,
     getUserRecentImages,
+    removeImageComment,
     removeImageTag, 
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
@@ -81,6 +82,7 @@ export async function actionAddImageComment(_id: string, comment: string) {
     }
 
     return {
+        _id: res._id,
         commenter: res.commenter,
         text: res.text,
         createdAt: res.createdAt,
@@ -90,4 +92,10 @@ export async function actionAddImageComment(_id: string, comment: string) {
 export async function actionGetImageComments(_id: string) {
     console.log('actionGetImageComments _id: ', _id)
     return await getImageComments(_id);
+}
+
+export async function actionRemoveImageComment(imageId: string, commentId: string) {
+    const res = await removeImageComment(imageId, commentId)
+
+    return res.acknowledged && res.modifiedCount > 0;
 }

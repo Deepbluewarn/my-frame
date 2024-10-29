@@ -1,12 +1,16 @@
 'use client'
 
+import { actionRemoveImageComment } from "@/actions/image";
 import { IComment, ICommenter } from "@/db/models/Image";
-import { Avatar, Flex, Text } from "@mantine/core";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { Avatar, Button, Flex, Text } from "@mantine/core";
 
 export default function Comment(
-    { comment, pictureOwnerSub }: 
-    { comment: IComment[], pictureOwnerSub?: string }
-) { 
+    { imageId, comment, removeComment, pictureOwnerSub }:
+    { imageId: string, comment: IComment[], removeComment: (commentId: string) => void, pictureOwnerSub?: string }
+) {
+    const { user } = useUser();
+
     return (
         <Flex gap={8} direction={'column'}>
             {
@@ -33,6 +37,21 @@ export default function Comment(
                             </Flex>
                             <Text>{cmt.text}</Text>
                         </Flex>
+                        {
+                            user?.sub === (cmt.commenter as ICommenter).sub ? (
+                                <Button 
+                                    variant="transparent" 
+                                    style={{
+                                        alignSelf: 'flex-start',
+                                        margin: '0 0 0 auto'
+                                    }}
+                                    onClick={() => {removeComment(cmt._id)}}
+                                >
+                                    삭제
+                                </Button>
+                            ) : null
+                        }
+
                     </Flex>
                 ))
             }

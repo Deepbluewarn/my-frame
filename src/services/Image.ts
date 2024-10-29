@@ -181,6 +181,7 @@ export async function addImageComment(imageId: string, commenterId: string, comm
     const newComments = newImage.comments;
 
     return {
+        _id: newComments[newComments.length - 1]._id,
         commenter: {
             username: commenter.username,
             profilePicture: commenter.profilePicture,
@@ -259,4 +260,11 @@ export async function getImageComments(imageId: string) {
         }
         return res;
     })
+}
+
+export async function removeImageComment(imageId: string, commentId: string) {
+    return await Image.updateOne(
+        { _id: imageId },
+        { $pull: { comments: { _id: commentId } }}
+    );
 }

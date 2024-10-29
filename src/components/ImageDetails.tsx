@@ -143,8 +143,10 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                                 <Text>댓글 {comment.length}개</Text>
 
                                 <Comment 
+                                    imageId={current._id}
                                     comment={comment} 
                                     pictureOwnerSub={current.ownerDetails.sub} 
+                                    removeComment={removeComment}
                                 />
                             </>
                         ) : <Text>댓글 0개</Text>
