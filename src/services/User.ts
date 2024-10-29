@@ -36,6 +36,11 @@ export const userLookupPipeline = [
     },
 ]
 
+export async function getUserById(_id: string) {
+    await dbConnect();
+    return User.findOne({ _id })
+}
+
 export async function getUserBySub(sub: string) {
     await dbConnect();
     return User.findOne({ sub })
