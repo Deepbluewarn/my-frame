@@ -12,10 +12,16 @@ import {
 } from "@mantine/core";
 import { IconCircleChevronLeft, IconCircleChevronRight } from "@tabler/icons-react";
 import ImageThumbnailList from "./ImageThumbnailList";
+import Comment from '@/components/Comment';
 
 export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
-    const { next, prev, list, current, loading, addTags, removeTags } = useImageList(images);
+    const { 
+        next, prev, list, current, loading, 
+        addTags, removeTags, 
+        addComment, removeComment, comment
+    } = useImageList(images);
     const [tagStrInput, setTagStrInput] = useState('');
+    const [commentStrInput, setCommentStrInput] = useState('');
 
     const onNextClicked = useCallback(async () => {
         if (loading) return;
@@ -34,6 +40,14 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
 
         addTags(target.value);
         setTagStrInput('');
+    }
+
+    const onImageCommentEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key !== 'Enter') return;
+        const target = e.currentTarget;
+
+        addComment(target.value)
+        setCommentStrInput('');
     }
 
     if (!current) return null;
@@ -124,28 +138,14 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                     <Divider className={Styles.list_divider}/>
 
                     {
-                        current.comments ? (
+                        comment ? (
                             <>
-                                <Text>댓글 {current.comments.length}개</Text>
+                                <Text>댓글 {comment.length}개</Text>
 
-                                <Box>
-                                    {
-                                        current.comments.map(comment => (
-                                            <Flex gap={8} align='center'>
-                                                {/* <Avatar
-                                                    size="md"
-                                                    src={comment.user.profilePicture}
-                                                    alt={comment.user.username}
-                                                    radius="xl"
-                                                />
-                                                <Flex direction='column' gap={8}>
-                                                    <Text fw={700}>{comment.user.username}</Text>
-                                                    <Text>{comment.text}</Text>
-                                                </Flex> */}
-                                            </Flex>
-                                        ))
-                                    }
-                                </Box>
+                                <Comment 
+                                    comment={comment} 
+                                    pictureOwnerSub={current.ownerDetails.sub} 
+                                />
                             </>
                         ) : <Text>댓글 0개</Text>
                     }
@@ -153,7 +153,12 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                     <Divider className={Styles.list_divider}/>
 
                     <Box>
-                        <TextInput placeholder="댓글 추가하기" />
+                        <TextInput 
+                            value={commentStrInput}
+                            onChange={(e) => setCommentStrInput(e.target.value)}
+                            onKeyDown={onImageCommentEnter}
+                            placeholder="댓글 추가하기" 
+                        />
                     </Box>
                 </Flex>
                 <Flex direction='column' flex='1' className={Styles.detail_right}>

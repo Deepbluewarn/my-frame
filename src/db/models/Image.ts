@@ -3,9 +3,14 @@ import mongoose, { Model, Schema, Types } from 'mongoose';
 export type Visibility = 'public' | 'follow' | 'private';
 export const visibilityArray: Visibility[] = ['public', 'follow', 'private'];
 
-export interface IComment {
-    userId: string;
+export interface ICommenter {
+    profilePicture: string;
     username: string;
+    sub: string;
+}
+export interface IComment {
+    _id: string;
+    commenter: string | ICommenter;
     text: string;
     createdAt: Date;
 }
@@ -22,7 +27,7 @@ export interface ImageInterface {
     owner: string;
     uploadedAt: Date;
     likes?: number;
-    comments?: IComment[];
+    comments: IComment[];
     visibility: Visibility;
 }
 
@@ -30,7 +35,7 @@ type ImageModel = Model<ImageInterface>;
 
 // 이미지 스키마 정의
 export const ImageSchema: Schema = new Schema<ImageInterface, ImageModel>({
-    _id: { type: String, default: new Types.ObjectId().toString() },
+    _id: { type: String, default: () => new Types.ObjectId().toString() },
     url: { type: String, required: true },
     width: { type: Number, required: true },
     height: { type: Number, required: true },
@@ -42,8 +47,8 @@ export const ImageSchema: Schema = new Schema<ImageInterface, ImageModel>({
     likes: { type: Number, default: 0 },
     comments: [
         {
-            userId: { type: String, ref: 'User', required: true },
-            username: { type: String, required: true },
+            _id: { type: String, default: () => new Types.ObjectId().toString() },
+            commenter: { type: String, ref: 'User', required: true },
             text: { type: String, required: true },
             createdAt: { type: Date, default: Date.now }
         }

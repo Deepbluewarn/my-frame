@@ -1,9 +1,12 @@
 import {
+    actionAddImageComment,
     actionAddImageTags,
+    actionGetImageComments,
     actionGetNextImagesById,
     actionGetPrevImagesById,
     actionRemoveImageTag,
 } from "@/actions/image";
+import { IComment } from "@/db/models/Image";
 import { ImageWithOwner } from "@/services/Image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -22,6 +25,7 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     const [imageCache, setImageCache] = useState<ImageListGeneric>(new Map());
     const [currentImgId, setCurrentImgId] = useState(use_pathname.split('/')[2]);
     const [loading, setLoading] = useState(false);
+    const [comment, setComment] = useState<IComment[]>([]);
 
     useEffect(() => {
         const pageImages = initImages.map((v, i) => {
@@ -43,7 +47,18 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     }, [])
 
     useEffect(() => {
-        setCurrentImgId(use_pathname.split('/')[2])
+        actionGetImageComments(currentImgId).then(comment => {
+            setComment(comment ?? []);
+        })
+    }, [currentImgId])
+
+    useEffect(() => {
+        const newImgId = use_pathname.split('/')[2]
+
+        if (newImgId !== currentImgId) {
+            setCurrentImgId(newImgId);
+        }
+        
     }, [use_pathname])
 
     const updateHistory = (imageId: string) => {
@@ -141,6 +156,19 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         })
     }
 
+    const addComment = (comment: string) => {
+        actionAddImageComment(currentImgId, comment).then((addedComment) => {
+            console.log('useImageList addComment addedComment: ', addedComment)
+            setComment(comments => {
+                return [...comments, addedComment]
+            })
+        })
+    }
+
+    const removeComment = () => {
+
+    }
+
     const addNextImage = async (lastImgId: string) => {
         const newImage = await actionGetNextImagesById(lastImgId, 1);
 
@@ -227,5 +255,6 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     return {
         next, prev, list, current, loading, 
         addTags, removeTags,
+        addComment, removeComment, comment
     }
 }

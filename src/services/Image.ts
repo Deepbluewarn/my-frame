@@ -1,9 +1,9 @@
 'use server'
 
 import dbConnect from "@/db/init";
-import Image, { ImageInterface } from "@/db/models/Image";
+import Image, { ICommenter, IComment, ImageInterface } from "@/db/models/Image";
 import { HydratedDocument } from "mongoose";
-import { ownerLookupPipeline } from "./User";
+import { getUserById, ownerLookupPipeline } from "./User";
 import { UserInterface } from "@/db/models/User";
 import { getVisibilityPipeline } from "@/utils/service";
 
@@ -47,7 +47,7 @@ export async function getNextImagesById({ _id, viewerId, ownerId, limit = 1 }: {
         }, {
             $limit: limit
         },
-        
+
     ])
 }
 
@@ -155,4 +155,108 @@ export async function removeImageTag(imageId: string, tag: string) {
         { _id: imageId }, 
         { $pull: { tags: tag }}
     )
+}
+
+export async function addImageComment(imageId: string, commenterId: string, comment: string) {
+    await dbConnect();
+
+    const commenter = await getUserById(commenterId);
+    const newImage = await Image.findOneAndUpdate(
+        { _id: imageId },
+        {
+            $push: {
+                comments: {
+                    commenter: commenterId,
+                    text: comment,
+                }
+            }
+        },
+        { new: true }
+    )
+
+    if (!newImage || !commenter) {
+        return;
+    }
+
+    const newComments = newImage.comments;
+
+    return {
+        commenter: {
+            username: commenter.username,
+            profilePicture: commenter.profilePicture,
+            sub: commenter.sub,
+        } as ICommenter,
+        text: newComments[newComments.length - 1].text,
+        createdAt: newComments[newComments.length - 1].createdAt,
+    } as IComment;
+}
+
+export async function getImageComments(imageId: string) {
+    const image = await Image.aggregate([
+        {
+            $match: { _id: imageId }
+        },
+        {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'comments.commenter',
+                'foreignField': '_id',
+                'as': 'commenter',
+                'pipeline': [
+                    {
+                        '$project': {
+                            'profilePicture': 1,
+                            'username': 1,
+                            'sub': 1,
+                        }
+                    }
+                ]
+            }
+        }, {
+            '$unwind': {
+                'path': '$comments'
+            }
+        }, {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'comments.commenter',
+                'foreignField': '_id',
+                'as': 'comments.commenter',
+                'pipeline': [
+                    {
+                        '$project': {
+                            'profilePicture': 1,
+                            'username': 1,
+                            'sub': 1,
+                        }
+                    }
+                ]
+            }
+        }, {
+            '$unwind': {
+                'path': '$comments.commenter'
+            }
+        }, {
+            '$group': {
+                '_id': '$_id',
+                'comments': {
+                    '$push': '$comments'
+                }
+            }
+        }
+    ])
+
+    if (!image || image.length <= 0) {
+        return null;
+    }
+
+    return (image[0].comments as IComment[]).map(c => {
+        const res: IComment = {
+            _id: c._id,
+            commenter: c.commenter,
+            text: c.text,
+            createdAt: c.createdAt,
+        }
+        return res;
+    })
 }

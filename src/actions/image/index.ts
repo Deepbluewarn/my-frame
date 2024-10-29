@@ -1,8 +1,10 @@
 'use server'
 
 import { 
+    addImageComment,
     addImageTags,
     getImageById, 
+    getImageComments, 
     getNextImagesById, 
     getPrevImagesById, 
     getSurroundingImagesById,
@@ -10,6 +12,7 @@ import {
     removeImageTag, 
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
+import { IComment } from "@/db/models/Image";
 
 export async function actionGetImageById(_id: string) {
     const viewerId = await actionGetUserIdBySub();
@@ -45,7 +48,7 @@ export async function actionAddImageTags(_id: string, tags: string[]) {
     const owner = await actionGetImageById(_id);
 
     if (viewerId !== owner.ownerDetails._id) {
-        console.log('태그 업데이트 실패. 이미지의 소유자만 태그를 업데이트 할 수 있습니다.')
+        throw new Error('태그 업데이트 실패. 이미지의 소유자만 태그를 업데이트 할 수 있습니다.')
     }
 
     return await addImageTags(_id, tags);
@@ -56,8 +59,35 @@ export async function actionRemoveImageTag(_id: string, tag: string) {
     const owner = await actionGetImageById(_id);
 
     if (viewerId !== owner.ownerDetails._id) {
-        console.log('태그 업데이트 실패. 이미지의 소유자만 태그를 업데이트 할 수 있습니다.')
+        throw new Error('태그 업데이트 실패. 이미지의 소유자만 태그를 업데이트 할 수 있습니다.')
     }
 
     return await removeImageTag(_id, tag);
+}
+
+export async function actionAddImageComment(_id: string, comment: string) {
+    const commenterId = await actionGetUserIdBySub();
+
+    console.log('actionAddImageComment commenterId: ', commenterId)
+
+    if (!commenterId) {
+        throw new Error('댓글을 단 유저의 정보를 찾을 수 없습니다.')
+    }
+
+    const res = await addImageComment(_id, commenterId, comment);
+
+    if(!res) {
+        throw new Error('댓글 추가 실패')
+    }
+
+    return {
+        commenter: res.commenter,
+        text: res.text,
+        createdAt: res.createdAt,
+    } as IComment
+}
+
+export async function actionGetImageComments(_id: string) {
+    console.log('actionGetImageComments _id: ', _id)
+    return await getImageComments(_id);
 }
