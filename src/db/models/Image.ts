@@ -26,7 +26,7 @@ export interface ImageInterface {
     tags: string[];
     owner: string;
     uploadedAt: Date;
-    likes?: number;
+    likes?: string[];
     comments: IComment[];
     visibility: Visibility;
 }
@@ -44,7 +44,7 @@ export const ImageSchema: Schema = new Schema<ImageInterface, ImageModel>({
     tags: { type: [String], required: true },
     owner: { type: String, ref: 'User', required: true },
     uploadedAt: { type: Date, default: Date.now },
-    likes: { type: Number, default: 0 },
+    likes: { type: [String], ref: 'User', },
     comments: [
         {
             _id: { type: String, default: () => new Types.ObjectId().toString() },

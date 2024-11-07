@@ -1,13 +1,17 @@
 import {
     actionAddImageComment,
+    actionAddImageStar,
     actionAddImageTags,
     actionGetImageComments,
+    actionGetImageStarList,
     actionGetNextImagesById,
     actionGetPrevImagesById,
     actionRemoveImageComment,
+    actionRemoveImageStar,
     actionRemoveImageTag,
 } from "@/actions/image";
 import { IComment } from "@/db/models/Image";
+import { IUserInfo } from "@/db/models/User";
 import { ImageWithOwner } from "@/services/Image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -27,6 +31,7 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     const [currentImgId, setCurrentImgId] = useState(use_pathname.split('/')[2]);
     const [loading, setLoading] = useState(false);
     const [comment, setComment] = useState<IComment[]>([]);
+    const [starList, setStarList] = useState<IUserInfo[]>([]);
 
     useEffect(() => {
         const pageImages = initImages.map((v, i) => {
@@ -50,6 +55,11 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     useEffect(() => {
         actionGetImageComments(currentImgId).then(comment => {
             setComment(comment ?? []);
+        })
+
+        actionGetImageStarList(currentImgId).then(list => {
+            console.log(list)
+            setStarList(list);
         })
     }, [currentImgId])
 
@@ -176,6 +186,31 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         }
     }
 
+    const addStar = async (userSub?: string | null) => {
+        console.log('useImageList addStar userSub: ', userSub);
+
+        if (!userSub) return;
+
+        const res = await actionAddImageStar(currentImgId, userSub);
+
+        if (res) {
+            console.log(`userSub: ${userSub}가 이미지에 좋아요를 추가했습니다.`)
+            setStarList(list => [...list, res])
+        }
+    }
+    const removeStar = async (userSub?: string | null) => {
+        console.log('useImageList removeStar userSub: ', userSub);
+
+        if (!userSub) return;
+
+        const res = await actionRemoveImageStar(currentImgId, userSub);
+
+        if (res) {
+            console.log(`userSub: ${userSub}가 이미지에 좋아요를 취소했습니다.`)
+            setStarList(list => list.filter(l => l.sub !== res.sub))
+        }
+    }
+
     const addNextImage = async (lastImgId: string) => {
         const newImage = await actionGetNextImagesById(lastImgId, 1);
 
@@ -262,6 +297,7 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     return {
         next, prev, list, current, loading, 
         addTags, removeTags,
-        addComment, removeComment, comment
+        addComment, removeComment, comment,
+        addStar, removeStar, starList
     }
 }

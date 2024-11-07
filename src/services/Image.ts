@@ -1,10 +1,10 @@
 'use server'
 
 import dbConnect from "@/db/init";
-import Image, { ICommenter, IComment, ImageInterface } from "@/db/models/Image";
+import Image, { IComment, ImageInterface } from "@/db/models/Image";
 import { HydratedDocument } from "mongoose";
-import { getUserById, ownerLookupPipeline } from "./User";
-import { UserInterface } from "@/db/models/User";
+import { getUserById, getUserBySub, ownerLookupPipeline } from "./User";
+import { IUserInfo, UserInterface } from "@/db/models/User";
 import { getVisibilityPipeline } from "@/utils/service";
 
 export interface ImageWithOwner extends ImageInterface {
@@ -186,7 +186,7 @@ export async function addImageComment(imageId: string, commenterId: string, comm
             username: commenter.username,
             profilePicture: commenter.profilePicture,
             sub: commenter.sub,
-        } as ICommenter,
+        } as IUserInfo,
         text: newComments[newComments.length - 1].text,
         createdAt: newComments[newComments.length - 1].createdAt,
     } as IComment;
@@ -267,4 +267,85 @@ export async function removeImageComment(imageId: string, commentId: string) {
         { _id: imageId },
         { $pull: { comments: { _id: commentId } }}
     );
+}
+
+export async function getImageStarList(imageId: string): Promise<IUserInfo[]> {
+    const res = await Image.aggregate([
+        { $match: { _id: imageId }},
+        {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'likes',
+                'foreignField': '_id',
+                'as': 'likeUserList',
+                'pipeline': [
+                    {
+                        '$project': {
+                            'profilePicture': 1,
+                            'username': 1,
+                            'sub': 1,
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                likeUserList: 1
+            }
+        }
+    ])
+
+    console.log('Image Service getImageStarList likeUserList: ', JSON.stringify(res[0].likeUserList))
+
+    return res[0].likeUserList;
+}
+
+// 좋아요를 추가 또는 취소한 유저의 IUserInfo 객체를 반환.
+// 실패시 null 반환.
+export async function addImageStar(imageId: string, userSub: string): Promise<IUserInfo | null> {
+    const user = await getUserBySub(userSub);
+
+    if (!user) {
+        throw new Error('좋아요 추가에 실패했습니다. 회원 정보를 찾을 수 없습니다.')
+    }
+
+    const res = await Image.updateOne(
+        { _id: imageId },
+        { $addToSet: { likes: user._id }}
+    )
+
+    if (res.acknowledged && res.modifiedCount > 0) {
+        return {
+            profilePicture: user.profilePicture!,
+            username: user.username!,
+            sub: user.sub!
+        }
+    } else {
+        return null;
+    }
+}
+
+export async function removeImageStar(imageId: string, userSub: string): Promise<IUserInfo | null> {
+    const user = await getUserBySub(userSub);
+
+    if (!user) {
+        throw new Error('좋아요 취소에 실패했습니다. 회원 정보를 찾을 수 없습니다.')
+    }
+
+    const res = await Image.updateOne(
+        { _id: imageId },
+        { $pull: { likes: user._id }}
+    )
+
+    if (res.acknowledged && res.modifiedCount > 0) {
+        return {
+            profilePicture: user.profilePicture!,
+            username: user.username!,
+            sub: user.sub!
+        }
+    } else {
+        return null;
+    }
 }

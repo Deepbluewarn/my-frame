@@ -10,15 +10,20 @@ import {
     Divider, Flex, List, Pill, PillGroup,
     PillsInput, Text, TextInput
 } from "@mantine/core";
-import { IconCircleChevronLeft, IconCircleChevronRight } from "@tabler/icons-react";
+import { 
+    IconCircleChevronLeft, IconCircleChevronRight, 
+    IconStar, IconStarFilled, 
+} from "@tabler/icons-react";
 import ImageThumbnailList from "./ImageThumbnailList";
 import Comment from '@/components/Comment';
+import StarList from "./StarList";
 
 export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
     const { 
         next, prev, list, current, loading, 
         addTags, removeTags, 
-        addComment, removeComment, comment
+        addComment, removeComment, comment,
+        addStar, removeStar, starList, 
     } = useImageList(images);
     const [tagStrInput, setTagStrInput] = useState('');
     const [commentStrInput, setCommentStrInput] = useState('');
@@ -70,7 +75,7 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                     title={current.title}
                     description={current.description}
                     tags={current.tags}
-                    likes={current.likes || 0}
+                    likes={current.likes || []}
                     className={Styles.image}
                 />
                 <ActionIcon
@@ -130,10 +135,11 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
 
                     <Divider className={Styles.list_divider}/>
 
-                    <Flex direction='column' gap={8}>
-                        <Text>좋아요 {current.likes || 0}개</Text>
-                        <Button>좋아요</Button>
-                    </Flex>
+                    <StarList 
+                        starList={starList}
+                        addStar={addStar}
+                        removeStar={removeStar}
+                    />
 
                     <Divider className={Styles.list_divider}/>
 

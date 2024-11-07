@@ -2,14 +2,17 @@
 
 import { 
     addImageComment,
+    addImageStar,
     addImageTags,
     getImageById, 
     getImageComments, 
+    getImageStarList, 
     getNextImagesById, 
     getPrevImagesById, 
     getSurroundingImagesById,
     getUserRecentImages,
     removeImageComment,
+    removeImageStar,
     removeImageTag, 
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
@@ -98,4 +101,16 @@ export async function actionRemoveImageComment(imageId: string, commentId: strin
     const res = await removeImageComment(imageId, commentId)
 
     return res.acknowledged && res.modifiedCount > 0;
+}
+
+export async function actionGetImageStarList(imageId: string) {
+    return await getImageStarList(imageId);
+}
+
+export async function actionAddImageStar(imageId: string, userSub: string) {
+    return await addImageStar(imageId, userSub)
+}
+
+export async function actionRemoveImageStar(imageId: string, userSub: string) {
+    return await removeImageStar(imageId, userSub)
 }

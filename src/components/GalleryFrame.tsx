@@ -7,7 +7,7 @@ export default function GalleryFrame({
     width: number, height: number,
     url: string, title: string,
     description: string, tags: string[],
-    likes: number,
+    likes: string[],
     className?: string,
 }) {
   return (
