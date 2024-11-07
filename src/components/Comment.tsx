@@ -1,7 +1,7 @@
 'use client'
 
-import { actionRemoveImageComment } from "@/actions/image";
-import { IComment, ICommenter } from "@/db/models/Image";
+import { IComment } from "@/db/models/Image";
+import { IUserInfo } from "@/db/models/User";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { Avatar, Button, Flex, Text } from "@mantine/core";
 
@@ -19,26 +19,26 @@ export default function Comment(
                     <Flex gap={8} align='center' key={cmt._id}>
                         <Avatar
                             size="md"
-                            src={(cmt.commenter as ICommenter).profilePicture}
-                            alt={(cmt.commenter as ICommenter).username}
+                            src={(cmt.commenter as IUserInfo).profilePicture}
+                            alt={(cmt.commenter as IUserInfo).username}
                             radius="xl"
                         />
 
                         <Flex direction='column' gap={4}>
                             <Flex>
                                 {
-                                    pictureOwnerSub === (cmt.commenter as ICommenter).sub ? (
+                                    pictureOwnerSub === (cmt.commenter as IUserInfo).sub ? (
                                         <Text>👑</Text>
                                     ) : (
                                         null
                                     )
                                 }
-                                <Text fw={700}>{(cmt.commenter as ICommenter).username}</Text>
+                                <Text fw={700}>{(cmt.commenter as IUserInfo).username}</Text>
                             </Flex>
                             <Text>{cmt.text}</Text>
                         </Flex>
                         {
-                            user?.sub === (cmt.commenter as ICommenter).sub ? (
+                            user?.sub === (cmt.commenter as IUserInfo).sub ? (
                                 <Button 
                                     variant="transparent" 
                                     style={{

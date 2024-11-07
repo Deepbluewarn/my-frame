@@ -1,16 +1,12 @@
 import mongoose, { Model, Schema, Types } from 'mongoose';
+import { IUserInfo } from './User';
 
 export type Visibility = 'public' | 'follow' | 'private';
 export const visibilityArray: Visibility[] = ['public', 'follow', 'private'];
 
-export interface ICommenter {
-    profilePicture: string;
-    username: string;
-    sub: string;
-}
 export interface IComment {
     _id: string;
-    commenter: string | ICommenter;
+    commenter: string | IUserInfo;
     text: string;
     createdAt: Date;
 }

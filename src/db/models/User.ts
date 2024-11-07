@@ -1,6 +1,11 @@
 import mongoose, { Schema, Types, Model } from 'mongoose';
 import { ImageInterface } from '@/interface/Upload';
 
+export interface IUserInfo {
+    profilePicture: string;
+    username: string;
+    sub: string;
+}
 // 회원 인터페이스 정의
 export interface UserInterface {
     _id: string;
