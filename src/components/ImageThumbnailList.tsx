@@ -1,26 +1,41 @@
 import { ImageWithOwnerPagination } from "@/hooks/useImageList";
-import { Flex } from "@mantine/core";
+import { Box, Flex, stylesToString } from "@mantine/core";
 import Image from "next/image";
+import Styles from '@/styles/components/ImageThumbnailList.module.css';
 
 export default function ImageThumbnailList({
-    list
+    list, currentImageId
 } : {
-    list: (ImageWithOwnerPagination | undefined)[]
+    list: (ImageWithOwnerPagination | undefined)[],
+    currentImageId: string
 }) {
-    const midIdx = list.length % 2;
+
+    console.log(list)
     const imageList = list.map((l, idx) => {
         if (!l) return;
-        if (midIdx === idx) {
-            // 이미지 하이라이트
+
+        let cName = `${Styles.image_wrapper}`
+
+        if (l._id === currentImageId) {
+            console.log(l)
+            cName += ` ${Styles.current}`
         }
+
         return (
-            <Image src={l.url} width={30} height={30} alt={l.title}/>
+            <>
+                <Box className={cName}>
+                    <Image 
+                        className={Styles.image_thumbnail}
+                        src={l.url} alt={l.title} fill={true} 
+                    />
+                </Box>
+            </>
         )
     })
 
     return (
         <Flex gap={14}>
-            { imageList }
+            {imageList}
         </Flex>
     )
 }
