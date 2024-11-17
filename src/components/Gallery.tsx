@@ -13,11 +13,11 @@ export interface IGallery {
     height: number;
 }
 
-export default function GalleryComponent({ images }: { images: IGallery[] }) {
+export default function GalleryComponent({ images }: { images?: IGallery[] }) {
 
     return (
         <Box className={Styles.container}>
-            {images.map((image, index) => (
+            {images?.map((image, index) => (
                 <Box
                     key={index}
                     style={{ '--w': image.width, '--h': image.height }}

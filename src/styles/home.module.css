@@ -22,6 +22,13 @@
     transform: translate(0, -50%);
 }
 
+.recentImages {
+    min-width: 20rem;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 70px 40px 40px 40px;
+}
+
 .heroTitle {
     display: flex;
     flex-direction: column;
@@ -55,22 +62,4 @@
     &:hover {
         color: white;
     }
-}
-
-.image_container {
-    align-items: stretch;
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-}
-
-.image_container img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
 }

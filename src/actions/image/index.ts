@@ -9,6 +9,7 @@ import {
     getImageStarList, 
     getNextImagesById, 
     getPrevImagesById, 
+    getPublicImages, 
     getSurroundingImagesById,
     getUserRecentImages,
     removeImageComment,
@@ -26,6 +27,10 @@ export async function actionGetImageById(_id: string) {
 export async function actionGetUserRecentImages(limit: number, user_id: string) {
     const viewerId = await actionGetUserIdBySub();
     return await getUserRecentImages(limit, user_id, viewerId);
+}
+
+export async function actionGetPublicImages(limit?: number, last_image_id?: string) {
+    return await getPublicImages(limit, last_image_id)
 }
 
 export async function actionGetNextImagesById(_current_id: string, limit?: number) {

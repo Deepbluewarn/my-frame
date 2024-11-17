@@ -2,7 +2,7 @@
 
 import dbConnect from "@/db/init";
 import Image, { IComment, ImageInterface } from "@/db/models/Image";
-import { HydratedDocument } from "mongoose";
+import { HydratedDocument, PipelineStage } from "mongoose";
 import { getUserById, getUserBySub, ownerLookupPipeline } from "./User";
 import { IUserInfo, UserInterface } from "@/db/models/User";
 import { getVisibilityPipeline } from "@/utils/service";
@@ -31,6 +31,29 @@ export async function getImageById(_id: string, viewerId?: string) {
     await dbConnect();
 
     return (await getImage({ _id: _id }, viewerId))[0];
+}
+
+export async function getPublicImages(limit?: number, _id?: string) {
+    await dbConnect();
+    const pipelines: PipelineStage[] = [
+        ...ownerLookupPipeline,
+    ];
+
+    if (_id) {
+        pipelines.push({
+            $match: {
+                _id: { $gt: _id },
+            },
+        })
+    }
+
+    if (limit) {
+        pipelines.push({
+            $limit: limit,
+        })
+    }
+    
+    return await Image.aggregate<ImageWithOwner>(pipelines)
 }
 
 export async function getNextImagesById({ _id, viewerId, ownerId, limit = 1 }: {_id: string, viewerId?: string, ownerId: string, limit?: number}) {
