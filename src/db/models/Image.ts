@@ -36,7 +36,7 @@ export const ImageSchema: Schema = new Schema<ImageInterface, ImageModel>({
     width: { type: Number, required: true },
     height: { type: Number, required: true },
     title: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String },
     tags: { type: [String], required: true },
     owner: { type: String, ref: 'User', required: true },
     uploadedAt: { type: Date, default: Date.now },
