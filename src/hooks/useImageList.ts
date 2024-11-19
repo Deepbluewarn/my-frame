@@ -9,6 +9,7 @@ import {
     actionRemoveImageComment,
     actionRemoveImageStar,
     actionRemoveImageTag,
+    actionUpdateImageTitleAndDescription,
 } from "@/actions/image";
 import { IComment } from "@/db/models/Image";
 import { IUserInfo } from "@/db/models/User";
@@ -32,6 +33,8 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     const [loading, setLoading] = useState(false);
     const [comment, setComment] = useState<IComment[]>([]);
     const [starList, setStarList] = useState<IUserInfo[]>([]);
+
+    const current = imageCache.get(currentImgId);
 
     useEffect(() => {
         const pageImages = initImages.map((v, i) => {
@@ -77,7 +80,6 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         window.history.pushState(null, '', url)
     }
 
-    const current = imageCache.get(currentImgId);
 
     const next = async () => {
         setLoading(true);
@@ -211,6 +213,27 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         }
     }
 
+    const updateImageTitleAndDescription = async (new_title: string, new_description: string) => {
+        const update = await actionUpdateImageTitleAndDescription(currentImgId, new_title, new_description)
+
+        if (!update) {
+            throw new Error('사진 정보 업데이트에 실패했습니다.')
+        }
+
+        setImageCache(c => {
+            const newCache = new Map(c);
+
+            const image = newCache.get(currentImgId)
+
+            if (!image) return c;
+
+            image.title = update?.title || image.title;
+            image.description = update?.description || image.description;
+
+            return newCache;
+        });
+    }
+
     const addNextImage = async (lastImgId: string) => {
         const newImage = await actionGetNextImagesById(lastImgId, 1);
 
@@ -298,6 +321,7 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         next, prev, list, current, loading, 
         addTags, removeTags,
         addComment, removeComment, comment,
-        addStar, removeStar, starList
+        addStar, removeStar, starList,
+        updateImageTitleAndDescription, 
     }
 }

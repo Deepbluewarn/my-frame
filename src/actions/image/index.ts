@@ -14,7 +14,8 @@ import {
     getUserRecentImages,
     removeImageComment,
     removeImageStar,
-    removeImageTag, 
+    removeImageTag,
+    updateImageTitleAndDescription, 
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
 import { IComment } from "@/db/models/Image";
@@ -118,4 +119,8 @@ export async function actionAddImageStar(imageId: string, userSub: string) {
 
 export async function actionRemoveImageStar(imageId: string, userSub: string) {
     return await removeImageStar(imageId, userSub)
+}
+
+export async function actionUpdateImageTitleAndDescription(imageId: string, new_title: string, new_description: string) {
+    return await updateImageTitleAndDescription(imageId, new_title, new_description);
 }

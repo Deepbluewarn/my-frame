@@ -1,22 +1,22 @@
 'use client'
 
 import { ImageWithOwner } from "@/services/Image";
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import GalleryFrame from "@/components/GalleryFrame";
 import useImageList from "@/hooks/useImageList";
 import Styles from '@/styles/components/imageDetails.module.css';
 import {
-    ActionIcon, Avatar, Box, Button,
+    ActionIcon, Avatar, Box,
     Divider, Flex, List, Pill, PillGroup,
     PillsInput, Text, TextInput
 } from "@mantine/core";
 import { 
     IconCircleChevronLeft, IconCircleChevronRight, 
-    IconStar, IconStarFilled, 
 } from "@tabler/icons-react";
 import ImageThumbnailList from "./ImageThumbnailList";
 import Comment from '@/components/Comment';
 import StarList from "./StarList";
+import ImageSummary from "./ImageSummary";
 
 export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
     const { 
@@ -24,6 +24,7 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
         addTags, removeTags, 
         addComment, removeComment, comment,
         addStar, removeStar, starList, 
+        updateImageTitleAndDescription,
     } = useImageList(images);
     const [tagStrInput, setTagStrInput] = useState('');
     const [commentStrInput, setCommentStrInput] = useState('');
@@ -88,7 +89,7 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                 </ActionIcon>
 
                 <Box className={Styles.image_thumbnail_list}>
-                    <ImageThumbnailList list={list(2)} />
+                    <ImageThumbnailList list={list(2)} currentImageId={current._id} />
                 </Box>
             </Box>
             <Flex className={Styles.detail_container}>
@@ -100,11 +101,12 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                             alt={current.ownerDetails.username}
                             radius="xl"
                         />
-                        <Flex direction='column' gap={8}>
-                            <Text fw={700}>{current.ownerDetails.username}</Text>
-                            <Text fw={500}>{current.title}</Text>
-                            <Text>{current.description}</Text>
-                        </Flex>
+                        <ImageSummary 
+                            username={current.ownerDetails.username}
+                            title={current.title}
+                            description={current.description}
+                            updateImageTitleAndDescription={updateImageTitleAndDescription}
+                        />
                     </Flex>
 
                     <Divider className={Styles.list_divider}/>

@@ -50,6 +50,14 @@
     padding: 16px;
 }
 
+.image_summary {
+    width: 100%;
+}
+
+.edit_done_btn {
+    align-self: flex-end;
+}
+
 .list_divider {
     margin: 16px;
 }

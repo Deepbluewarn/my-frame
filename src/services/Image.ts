@@ -372,3 +372,23 @@ export async function removeImageStar(imageId: string, userSub: string): Promise
         return null;
     }
 }
+
+export async function updateImageTitleAndDescription(imageId: string, new_title: string, new_description: string) {
+    const imageInfo = {
+        title: new_title,
+        description: new_description
+    }
+    
+    const res = await Image.updateOne(
+        { _id: imageId },
+        { 
+            $set: imageInfo
+        }
+    )
+
+    if (res.acknowledged && res.modifiedCount > 0) {
+        return imageInfo
+    } else {
+        return null;
+    }
+}
