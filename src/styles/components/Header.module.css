@@ -28,3 +28,9 @@
     gap: 28px;
     align-items: center;
 }
+
+.centered-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
