@@ -8,9 +8,11 @@ export default function LoggedOut() {
                 <h1>멋진 사진을 자랑해보세요!</h1>
             </div>
             <Button
+                component='a'
                 variant="white"
                 color="black"
                 size="md"
+                href='/api/auth/signup'
             >
                 시작하기
             </Button>

@@ -5,5 +5,8 @@ export const GET = handleAuth({
         authorizationParams: {
             prompt: 'login',
         }
+    }),
+    signup: handleLogin({
+        authorizationParams: { screen_hint: 'signup' }
     })
 });
