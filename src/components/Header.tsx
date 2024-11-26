@@ -1,5 +1,5 @@
-import { Box, Button } from "@mantine/core";
-import Styles from '../styles/Header/Header.module.css'
+import { Box, Button, Flex, Text } from "@mantine/core";
+import Styles from '../styles/components/Header.module.css'
 import { getSession } from "@auth0/nextjs-auth0";
 import MenuAvatar from "./MenuAvatar";
 import { IconUpload } from "@tabler/icons-react";
@@ -15,13 +15,18 @@ export default async function Header({ fixed = true }: { fixed?: boolean }) {
         <header className={headerClassNames.join(' ')}>
             <div className={Styles.inner}>
                 <Box className={Styles.logo}>
-                    <h2>MY FRAME</h2>
+                    <Link href={'/'}><Text fw={700} size="lg">MY FRAME</Text></Link>
                 </Box>
                 <Box className={Styles.links}>
                     {
                         user ? (
                             <>
-                                <Link className={Styles.upload} href='/upload'><IconUpload /></Link>
+                                <Flex gap={32}>
+                                    <Link href={'/explore/public'} className={Styles['centered-link']}>탐색</Link>
+                                    <Link href={'/explore/follow'} className={Styles['centered-link']}>팔로우</Link>
+                                    <Link href='/upload' className={Styles['centered-link']}><IconUpload /></Link>
+                                </Flex>
+                                
                                 <MenuAvatar />
                             </>
 
