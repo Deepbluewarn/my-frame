@@ -9,7 +9,6 @@
     flex-wrap: wrap;
     grid-gap: var(--space);
     list-style: none;
-    width: calc(100% - 16px);
 }
 
 .image_wrapper {

@@ -4,6 +4,7 @@ import {
     addImageComment,
     addImageStar,
     addImageTags,
+    getFollowerListWithImages,
     getImageById, 
     getImageComments, 
     getImageStarList, 
@@ -11,7 +12,7 @@ import {
     getPrevImagesById, 
     getPublicImages, 
     getSurroundingImagesById,
-    getUserRecentImages,
+    getUserImages,
     removeImageComment,
     removeImageStar,
     removeImageTag,
@@ -20,18 +21,27 @@ import {
 import { actionGetUserIdBySub } from "../user";
 import { IComment } from "@/db/models/Image";
 
+export interface ImagePaginationParams {
+    limit?: number;
+    last_image_id?: string;
+}
+
+export interface UserImagePaginationParams extends ImagePaginationParams {
+    user_id: string;
+}
+
 export async function actionGetImageById(_id: string) {
     const viewerId = await actionGetUserIdBySub();
     return await getImageById(_id, viewerId);
 }
 
-export async function actionGetUserRecentImages(limit: number, user_id: string) {
+export async function actionGetUserImages(params: UserImagePaginationParams) {
     const viewerId = await actionGetUserIdBySub();
-    return await getUserRecentImages(limit, user_id, viewerId);
+    return await getUserImages(params.limit, params.user_id, viewerId, params.last_image_id);
 }
 
-export async function actionGetPublicImages(limit?: number, last_image_id?: string) {
-    return await getPublicImages(limit, last_image_id)
+export async function actionGetPublicImages(params: ImagePaginationParams) {
+    return await getPublicImages(params.limit, params.last_image_id)
 }
 
 export async function actionGetNextImagesById(_current_id: string, limit?: number) {
@@ -123,4 +133,8 @@ export async function actionRemoveImageStar(imageId: string, userSub: string) {
 
 export async function actionUpdateImageTitleAndDescription(imageId: string, new_title: string, new_description: string) {
     return await updateImageTitleAndDescription(imageId, new_title, new_description);
+}
+
+export async function actionGetFollowerListWithImages(userSub: string) {
+    return await getFollowerListWithImages(userSub);
 }
