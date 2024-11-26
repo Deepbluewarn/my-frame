@@ -1,5 +1,4 @@
 import mongoose, { Schema, Types, Model } from 'mongoose';
-import { ImageInterface } from '@/interface/Upload';
 
 export interface IUserInfo {
     profilePicture: string;
@@ -16,7 +15,6 @@ export interface UserInterface {
     bio?: string;
     createdAt?: Date;
     updatedAt?: Date;
-    images?: ImageInterface[];
     followers?: string[];
     following?: string[];
     socialLinks?: {
@@ -39,7 +37,6 @@ const UserSchema: Schema = new Schema<UserInterface, UserModel>({
     bio: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    images: [{ type: String, ref: 'Image' }], 
     followers: [{ type: String, ref: 'User' }],
     following: [{ type: String, ref: 'User' }],
     socialLinks: {
