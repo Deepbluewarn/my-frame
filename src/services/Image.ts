@@ -4,11 +4,15 @@ import dbConnect from "@/db/init";
 import Image, { IComment, ImageInterface } from "@/db/models/Image";
 import { HydratedDocument, PipelineStage } from "mongoose";
 import { getUserById, getUserBySub, ownerLookupPipeline } from "./User";
-import { IUserInfo, UserInterface } from "@/db/models/User";
+import User, { IUserInfo, UserInterface } from "@/db/models/User";
 import { getVisibilityPipeline } from "@/utils/service";
 
 export interface ImageWithOwner extends ImageInterface {
     ownerDetails: UserInterface;
+}
+
+export interface IFollowerListWithImage extends ImageWithOwner{
+    followerImages: ImageInterface[];
 }
 
 export async function createImage(image: ImageInterface) {
@@ -33,7 +37,7 @@ export async function getImageById(_id: string, viewerId?: string) {
     return (await getImage({ _id: _id }, viewerId))[0];
 }
 
-export async function getPublicImages(limit?: number, _id?: string) {
+export async function getPublicImages(limit: number = 10, _id?: string) {
     await dbConnect();
     const pipelines: PipelineStage[] = [
         ...ownerLookupPipeline,
@@ -56,7 +60,7 @@ export async function getPublicImages(limit?: number, _id?: string) {
     return await Image.aggregate<ImageWithOwner>(pipelines)
 }
 
-export async function getNextImagesById({ _id, viewerId, ownerId, limit = 1 }: {_id: string, viewerId?: string, ownerId: string, limit?: number}) {
+export async function getNextImagesById({ _id, viewerId, ownerId, limit = 1 }: { _id: string, viewerId?: string, ownerId: string, limit?: number }) {
     await dbConnect();
 
     return await Image.aggregate<ImageWithOwner>([
@@ -74,18 +78,18 @@ export async function getNextImagesById({ _id, viewerId, ownerId, limit = 1 }: {
     ])
 }
 
-export async function getPrevImagesById({ _id, viewerId, ownerId, limit = 1 }: {_id: string, viewerId?: string, ownerId: string, limit?: number}) {
+export async function getPrevImagesById({ _id, viewerId, ownerId, limit = 1 }: { _id: string, viewerId?: string, ownerId: string, limit?: number }) {
     await dbConnect();
 
     return await Image.aggregate<ImageWithOwner>([
         ...ownerLookupPipeline,
         ...getVisibilityPipeline(viewerId),
         {
-            $match: { 
+            $match: {
                 owner: ownerId,
                 _id: { $lt: _id },
             },
-        }, 
+        },
         {
             $sort: { _id: -1 }
         },
@@ -102,7 +106,7 @@ export async function getSurroundingImagesById(imageId: string, radius: number, 
         ...ownerLookupPipeline,
         ...getVisibilityPipeline(viewerId),
         {
-            $match: { 
+            $match: {
                 owner: ownerId,
                 _id: { $gte: imageId },
             }
@@ -120,7 +124,7 @@ export async function getSurroundingImagesById(imageId: string, radius: number, 
                     ...ownerLookupPipeline,
                     ...getVisibilityPipeline(viewerId),
                     {
-                        $match: { _id: { $lt: imageId }, owner: ownerId}
+                        $match: { _id: { $lt: imageId }, owner: ownerId }
                     },
                     {
                         $sort: { _id: -1 }
@@ -144,10 +148,10 @@ export async function getSurroundingImagesById(imageId: string, radius: number, 
  * @param lastItemId pagination을 위한 마지막 이미지 문서의 _id
  * @returns ImageWithOwner[]
  */
-export async function getUserRecentImages(limit: number, userId: string, viewerId?: string, lastItemId?: string) {
+export async function getUserImages(limit: number = 10, userId: string, viewerId?: string, lastItemId?: string) {
     await dbConnect();
 
-    return await Image.aggregate([
+    return await Image.aggregate<ImageWithOwner>([
         ...ownerLookupPipeline,
         ...getVisibilityPipeline(viewerId),
         {
@@ -166,8 +170,8 @@ export async function addImageTags(imageId: string, tags: string[]) {
     await dbConnect();
 
     return await Image.updateOne(
-        { _id: imageId }, 
-        { $addToSet: { tags: { $each: tags } }}
+        { _id: imageId },
+        { $addToSet: { tags: { $each: tags } } }
     )
 }
 
@@ -175,8 +179,8 @@ export async function removeImageTag(imageId: string, tag: string) {
     await dbConnect();
 
     return await Image.updateOne(
-        { _id: imageId }, 
-        { $pull: { tags: tag }}
+        { _id: imageId },
+        { $pull: { tags: tag } }
     )
 }
 
@@ -288,13 +292,13 @@ export async function getImageComments(imageId: string) {
 export async function removeImageComment(imageId: string, commentId: string) {
     return await Image.updateOne(
         { _id: imageId },
-        { $pull: { comments: { _id: commentId } }}
+        { $pull: { comments: { _id: commentId } } }
     );
 }
 
 export async function getImageStarList(imageId: string): Promise<IUserInfo[]> {
     const res = await Image.aggregate([
-        { $match: { _id: imageId }},
+        { $match: { _id: imageId } },
         {
             '$lookup': {
                 'from': 'users',
@@ -336,7 +340,7 @@ export async function addImageStar(imageId: string, userSub: string): Promise<IU
 
     const res = await Image.updateOne(
         { _id: imageId },
-        { $addToSet: { likes: user._id }}
+        { $addToSet: { likes: user._id } }
     )
 
     if (res.acknowledged && res.modifiedCount > 0) {
@@ -359,7 +363,7 @@ export async function removeImageStar(imageId: string, userSub: string): Promise
 
     const res = await Image.updateOne(
         { _id: imageId },
-        { $pull: { likes: user._id }}
+        { $pull: { likes: user._id } }
     )
 
     if (res.acknowledged && res.modifiedCount > 0) {
@@ -378,10 +382,10 @@ export async function updateImageTitleAndDescription(imageId: string, new_title:
         title: new_title,
         description: new_description
     }
-    
+
     const res = await Image.updateOne(
         { _id: imageId },
-        { 
+        {
             $set: imageInfo
         }
     )
@@ -391,4 +395,66 @@ export async function updateImageTitleAndDescription(imageId: string, new_title:
     } else {
         return null;
     }
+}
+
+/**
+ * 
+ * @param userSub 팔로워 유저의 sub
+ * @param lastUserId pagination 구현, 팔로워 배열의 마지막 유저의 _id로 다음 페이지를 가져옴
+ * @returns 
+ */
+export async function getFollowerListWithImages(userSub: string, page: number = 1) {
+    const pageSize = 1;
+    // users 문서에서 팔로우 목록을 가져온다. (users의 _id로 구성된 배열)
+    // 이 배열의 각 요소를 기준으로 이미지 목록을 가져온다.
+
+    return await User.aggregate<IFollowerListWithImage>([
+        {
+            '$match': {
+                'sub': userSub
+            }
+        }, {
+            '$unwind': {
+                'path': '$following'
+            }
+        }, 
+        {
+            '$lookup': {
+                'from': 'images',
+                'localField': 'following',
+                'foreignField': 'owner',
+                'pipeline': [
+                    {
+                        '$limit': 4
+                    }
+                ],
+                'as': 'followerImages'
+            }
+        }, {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'following',
+                'foreignField': '_id',
+                'as': 'ownerDetails'
+            }
+        }, 
+        {
+            '$unwind': {
+                'path': '$ownerDetails'
+            }
+        },
+        {
+            '$project': {
+                '_id': 0,
+                'ownerDetails': 1,
+                'followerImages': 1
+            }
+        },
+        {
+            '$skip': (page - 1) * pageSize
+        },
+        {
+            '$limit': pageSize
+        }
+    ])
 }

@@ -52,13 +52,15 @@ export async function createUser(user: UserInterface) {
     return newUser.save();
 }
 
-export async function getUserInfoWithFollow(_id: string) {
+export async function getUserWithFollowInfo(_id: string, targetUserId: string) {
+
     await dbConnect();
+
     return await User.aggregate([
-        {
-            $match: { _id }
-        },
-        ...userLookupPipeline
+        { $match: { _id } },
+        { "$addFields": { followersCount: { $size: "$followers" }}},
+        { "$addFields": { followingCount: { $size: "$following" }}},
+        { "$addFields": { followed: { $cond: { if: { $in: [targetUserId, "$followers"] }, then: true, else: false } }}},
     ])
 }
 
@@ -70,6 +72,58 @@ export async function updateUserBySub(sub: string, updatedUserData: Partial<User
         { new: true, runValidators: true }
     );
     return updatedUser;
+}
+
+export async function followUser(userId: string, targetUserId: string) {
+    const result_1 = await User.updateOne(
+        { _id: userId },
+        {
+            $addToSet: { following: targetUserId }
+        }
+    )
+
+    if (!result_1.acknowledged || result_1.modifiedCount <= 0) {
+        return false;
+    }
+
+    const result_2 = await User.updateOne(
+        { _id: targetUserId },
+        {
+            $addToSet: { followers: userId }
+        }
+    )
+
+    if (!result_2.acknowledged || result_2.modifiedCount <= 0) {
+        return false;
+    }
+
+    return true;
+}
+
+export async function unFollowUser(userId: string, targetUserId: string) {
+    const result_1 = await User.updateOne(
+        { _id: userId },
+        {
+            $pull: { following: targetUserId }
+        }
+    )
+
+    if (!result_1.acknowledged || result_1.modifiedCount <= 0) {
+        return false;
+    }
+
+    const result_2 = await User.updateOne(
+        { _id: targetUserId },
+        {
+            $pull: { followers: userId }
+        }
+    )
+
+    if (!result_2.acknowledged || result_2.modifiedCount <= 0) {
+        return false;
+    }
+
+    return true;
 }
 
 export async function addImageToUser(sub: string, imageId: string) {

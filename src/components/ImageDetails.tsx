@@ -17,6 +17,7 @@ import ImageThumbnailList from "./ImageThumbnailList";
 import Comment from '@/components/Comment';
 import StarList from "./StarList";
 import ImageSummary from "./ImageSummary";
+import Link from "next/link";
 
 export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
     const { 
@@ -101,12 +102,21 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                             alt={current.ownerDetails.username}
                             radius="xl"
                         />
-                        <ImageSummary 
-                            username={current.ownerDetails.username}
-                            title={current.title}
-                            description={current.description}
-                            updateImageTitleAndDescription={updateImageTitleAndDescription}
-                        />
+
+                        <Flex direction={'column'} gap={8}>
+                            <Link href={`/user/${current.ownerDetails._id}`} target="_blank">
+                                <Text fw={700}>bluewarn</Text>
+                            </Link>
+
+                            <ImageSummary
+                                username={current.ownerDetails.username}
+                                title={current.title}
+                                description={current.description}
+                                updateImageTitleAndDescription={updateImageTitleAndDescription}
+                            />
+                        </Flex>
+
+                        
                     </Flex>
 
                     <Divider className={Styles.list_divider}/>

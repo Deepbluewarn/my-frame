@@ -3,6 +3,7 @@
 import { Button, Flex, Text, TextInput } from "@mantine/core"
 import { useEffect, useRef, useState } from "react";
 import Styles from '@/styles/components/imageDetails.module.css';
+import Link from "next/link";
 
 export default function ImageSummary(
     {
@@ -50,7 +51,6 @@ export default function ImageSummary(
             id="image_summary"
             ref={summaryRef}
         >
-            <Text fw={700}>{username}</Text>
             <Flex onClick={() => setEditing(true)} direction='column' gap={8}>
                 {
                     editing ? (

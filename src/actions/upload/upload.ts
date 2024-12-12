@@ -90,6 +90,7 @@ export const UploadAction = async (metadata: ImageInterface[] | null, data: Form
                 tags: Array.from(metaFile?.tags),
                 owner: userDocument._id,
                 uploadedAt: new Date(),
+                comments: [],
                 visibility: metaFile.visibility,
             });
     

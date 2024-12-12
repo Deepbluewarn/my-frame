@@ -20,6 +20,7 @@ import {
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
 import { IComment } from "@/db/models/Image";
+import { getSession } from "@auth0/nextjs-auth0";
 
 export interface ImagePaginationParams {
     limit?: number;
@@ -135,6 +136,13 @@ export async function actionUpdateImageTitleAndDescription(imageId: string, new_
     return await updateImageTitleAndDescription(imageId, new_title, new_description);
 }
 
-export async function actionGetFollowerListWithImages(userSub: string) {
-    return await getFollowerListWithImages(userSub);
+export async function actionGetFollowerListWithImages(page: number = 1) {
+    const session = await getSession();
+    const user = session?.user;
+
+    if (!user) {
+        return [];
+    }
+
+    return await getFollowerListWithImages(user.sub, page);
 }

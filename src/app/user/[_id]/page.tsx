@@ -1,4 +1,3 @@
-import { actionGetUserInfoWithFollow } from "@/actions/user";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { Box, Divider } from "@mantine/core";
 import { isValidObjectId } from "mongoose";
@@ -8,19 +7,15 @@ import GalleryList from "@/components/GalleryList";
 import { actionGetUserImages } from "@/actions/image";
 
 export default async function Page({ params }: { params: { _id: string } }) {
-    if (!isValidObjectId(params._id)) notFound();
+    if (!isValidObjectId(params._id)) {
+        notFound();
+    }
 
-    const userInfo = (await actionGetUserInfoWithFollow(params._id))[0]
 
     return (
         <>
             <Box className={Styles.profile_container}>
-                <ProfileAvatar
-                    name={userInfo.username}
-                    picture={userInfo.profilePicture}
-                    followers={userInfo.followers.length}
-                    following={userInfo.following.length}
-                />
+                <ProfileAvatar userId={ params._id }/>
             </Box>
             <Divider />
 

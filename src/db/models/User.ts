@@ -37,8 +37,8 @@ const UserSchema: Schema = new Schema<UserInterface, UserModel>({
     bio: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    followers: [{ type: String, ref: 'User' }],
-    following: [{ type: String, ref: 'User' }],
+    followers: { type: [String], ref: 'User' },
+    following: { type: [String], ref: 'User' },
     socialLinks: {
         facebook: { type: String },
         twitter: { type: String },
