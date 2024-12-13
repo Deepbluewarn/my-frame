@@ -1,51 +1,45 @@
-import { actionGetUserWithFollowInfo } from "@/actions/user";
-import { getSession } from "@auth0/nextjs-auth0";
+'use client'
+
 import {
     Flex, Text, Avatar
 } from "@mantine/core";
-import { isValidObjectId } from "mongoose";
 import FollowButton from "./FollowButton";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { useState } from "react";
+import { IUserWithFollowInfo } from "@/services/User";
 
-export default async function ProfileAvatar({ userId }: { userId: string }) {
-    if (!isValidObjectId(userId)) {
-        return null;
-    }
-
-    const session = await getSession();
-    const currentUser = session?.user;
-
-    if (!currentUser) {
-        return null;
-    }
-
-    const userFollowInfo = (await actionGetUserWithFollowInfo(userId, currentUser.sub))[0];
+export default function ProfileAvatar({ userInfo } : { userInfo: IUserWithFollowInfo }) {
+    const { user: currentUser, error, isLoading } = useUser();
+    const [userFollowInfo, setUserFollowInfo] = useState<IUserWithFollowInfo>(userInfo);
 
     if (!userFollowInfo) {
         return null;
     }
+    if (!currentUser || !currentUser.sub) {
+        return null;
+    }
 
-    
     return (
         <Flex gap={8}>
-            <Avatar src={userFollowInfo.profilePicture} alt={userFollowInfo.username} />
+            <Avatar src={userInfo.profilePicture} alt={userInfo.username} />
             <Flex direction='column' gap={8}>
                 <Flex align={'center'} gap={16}>
                     <Text component="div" style={{
                         maxWidth: '10rem',
                         wordBreak: 'break-word',
-                    }}>{userFollowInfo.username}</Text>
+                    }}>{userInfo.username}</Text>
+                    {
+                        currentUser?.sub === userInfo.sub ? (
+                            null
+                        ) : (
+                            <FollowButton userId={userInfo._id} currentUserSub={currentUser.sub} />
+                        )
+                    }
                 </Flex>
-                {
-                    currentUser?.sub === userFollowInfo.sub ? (
-                        null
-                    ) : (
-                        <FollowButton userId={userId} currentUserSub={currentUser.sub}/>
-                    )
-                }
 
                 <Flex gap={16}>
-                    <Text>{`${userFollowInfo.followersCount} 팔로워`}</Text>
-                    <Text>{`${userFollowInfo.followingCount} 팔로잉`}</Text>
+                    <Text>{`${userInfo.followersCount} 팔로워`}</Text>
+                    <Text>{`${userInfo.followingCount} 팔로잉`}</Text>
                 </Flex>
             </Flex>
         </Flex>

@@ -5,17 +5,22 @@ import { notFound } from "next/navigation";
 import Styles from '@/styles/user.module.css';
 import GalleryList from "@/components/GalleryList";
 import { actionGetUserImages } from "@/actions/image";
+import { actionGetUserWithFollowInfo } from "@/actions/user";
+import { getSession } from "@auth0/nextjs-auth0";
 
 export default async function Page({ params }: { params: { _id: string } }) {
     if (!isValidObjectId(params._id)) {
         notFound();
     }
 
+    const session = await getSession()
+    const user = session?.user;
 
+    const userInfo = (await actionGetUserWithFollowInfo(params._id, user?.sub))[0];
     return (
         <>
             <Box className={Styles.profile_container}>
-                <ProfileAvatar userId={ params._id }/>
+                <ProfileAvatar userInfo={userInfo} />
             </Box>
             <Divider />
 
