@@ -1,10 +1,11 @@
 'use client'
 
 import { actionGetFollowerListWithImages } from '@/actions/image';
-import { Button, Text } from '@mantine/core';
+import { Avatar, Button, Group, Stack, Text } from '@mantine/core';
 import GalleryComponent, { IGallery } from '@/components/Gallery';
 import { IFollowerListWithImage } from '@/services/Image';
 import { useEffect, useState } from 'react';
+import Styles from '@/styles/home.module.css'
 
 export default function ExploreFollowerImages() {
   const [fImages, setFImages] = useState<IFollowerListWithImage[]>([]);
@@ -36,9 +37,16 @@ export default function ExploreFollowerImages() {
         height: img.height,
       }
     })
+
+    if (!gallaryImages || gallaryImages.length <= 0) {
+      return null;
+    }
     return (
       <>
-        <Text>{fList.ownerDetails.username}</Text>
+        <Group>
+          <Avatar src={fList.ownerDetails.profilePicture} alt={fList.ownerDetails.username} />
+          <Text>{fList.ownerDetails.username}</Text>
+        </Group>
         <GalleryComponent images={gallaryImages} />
       </>
     )
@@ -48,13 +56,20 @@ export default function ExploreFollowerImages() {
   // 만약 팔로우한 유저가 없으면 "친구가 없습니다. 새로운 친구를 팔로우 해보세요!"
 
   return (
-    <>
-      <Text>팔로우</Text>
-      <Text>팔로우한 회원의 사진을 볼 수 있습니다.</Text>
-
-      {comp}
-
-      <Button onClick={loadMore}>더 보기</Button>
-    </>
+    <Stack className={Styles.content}>
+      <Text fw={700} size="xl">팔로우</Text>
+      
+      {
+        comp.length > 0 ? (
+          <>
+            <Text c={'dimmed'}>팔로우한 유저의 사진입니다.</Text>
+            {comp}
+            <Button onClick={loadMore}>더 보기</Button>
+          </>
+        ) : (
+          <Text c={'dimmed'}>친구가 없습니다. 새로운 친구를 팔로우 해보세요!</Text>
+        )
+      }
+    </Stack>
   )
 }
