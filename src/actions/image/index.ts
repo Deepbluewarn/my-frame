@@ -16,6 +16,7 @@ import {
     removeImageComment,
     removeImageStar,
     removeImageTag,
+    searchImages,
     updateImageTitleAndDescription, 
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
@@ -145,4 +146,8 @@ export async function actionGetFollowerListWithImages(page: number = 1) {
     }
 
     return await getFollowerListWithImages(user.sub, page);
+}
+
+export async function actionSearchImages(query: string, page: number = 1, pageSize: number = 10) {
+    return await searchImages(query, page, pageSize);
 }

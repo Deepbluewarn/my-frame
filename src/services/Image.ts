@@ -6,6 +6,7 @@ import { HydratedDocument, PipelineStage } from "mongoose";
 import { getUserById, getUserBySub, ownerLookupPipeline } from "./User";
 import User, { IUserInfo, UserInterface } from "@/db/models/User";
 import { getVisibilityPipeline } from "@/utils/service";
+import { SearchResult } from "./types";
 
 export interface ImageWithOwner extends ImageInterface {
     ownerDetails: UserInterface;
@@ -457,4 +458,41 @@ export async function getFollowerListWithImages(userSub: string, page: number = 
             '$limit': pageSize
         }
     ])
+}
+
+export async function searchImages(query: string, page: number = 1, pageSize: number = 10): Promise<SearchResult<ImageInterface>> {
+    await dbConnect();
+
+    const words = decodeURI(query).split(' ').map(word => new RegExp(word, 'i')); // 'i' for case-insensitive
+
+    const images = await Image.aggregate([
+        {
+            $match: {
+                $or: [
+                    { title: { $in: words } },
+                    { tags: { $in: words } },
+                    { description: { $in: words } }
+                ]
+            }
+        },
+        {
+            $facet: {
+                results: [
+                    { $skip: (page - 1) * pageSize },
+                    { $limit: pageSize }
+                ],
+                totalCount: [
+                    { $count: 'count' }
+                ]
+            }
+        }
+    ]);
+
+    const totalCount = images[0].totalCount[0] ? images[0].totalCount[0].count : 0;
+
+    return {
+        results: images[0].results,
+        totalCount,
+        totalPages: Math.ceil(totalCount / pageSize),
+    };
 }

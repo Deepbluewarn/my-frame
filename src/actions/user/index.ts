@@ -1,6 +1,6 @@
 'use server'
 
-import { followUser, getUserBySub, getUserWithFollowInfo, unFollowUser } from "@/services/User";
+import { followUser, getUserBySub, getUserWithFollowInfo, searchUsers, unFollowUser } from "@/services/User";
 import { getSession } from "@auth0/nextjs-auth0";
 
 export async function actionGetUserIdBySub() {
@@ -29,4 +29,9 @@ export async function actionFollowUser(targetUserId: string, userSub: string) {
 export async function actionUnFollowUser(targetUserId: string, userSub: string) {
     const userId = (await getUserBySub(userSub))?._id || '';
     return await unFollowUser(userId, targetUserId);
+}
+
+export async function actionSearchUsers(query: string, targetUserSub: string, page: number = 1, pageSize: number = 10) {
+    const targetUserId = (await getUserBySub(targetUserSub))?._id || '';
+    return await searchUsers(query, targetUserId, page, pageSize);
 }

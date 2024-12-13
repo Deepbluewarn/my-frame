@@ -1,6 +1,7 @@
 import dbConnect from "@/db/init";
 import User, { UserInterface } from "@/db/models/User";
 import { HydratedDocument } from "mongoose";
+import { SearchResult } from "./types";
 
 // 이미지 문서의 owner 속성 populate
 export const ownerLookupPipeline = [
@@ -52,11 +53,15 @@ export async function createUser(user: UserInterface) {
     return newUser.save();
 }
 
+export interface IUserWithFollowInfo extends UserInterface{
+    followersCount: number;
+    followingCount: number;
+    followed: boolean;
+}
 export async function getUserWithFollowInfo(_id: string, targetUserId: string) {
-
     await dbConnect();
 
-    return await User.aggregate([
+    return await User.aggregate<IUserWithFollowInfo>([
         { $match: { _id } },
         { "$addFields": { followersCount: { $size: "$followers" }}},
         { "$addFields": { followingCount: { $size: "$following" }}},
@@ -137,4 +142,44 @@ export async function addImageToUser(sub: string, imageId: string) {
 export async function deleteUserBySub(sub: string) {
     await dbConnect();
     await User.deleteOne({ sub });
+}
+
+export async function searchUsers(
+    query: string, targetUserId: string, page: number = 1, pageSize: number = 10): Promise<SearchResult<IUserWithFollowInfo>>{
+
+    await dbConnect();
+    const words = decodeURI(query).split(' ').map(word => new RegExp(word, 'i')); // 'i' for case-insensitive
+    
+    const users = await User.aggregate([
+        {
+            $match: {
+                $or: [
+                    { username: { $in: words } },
+                    { email: { $in: words } }
+                ]
+            }
+        },
+        { "$addFields": { followersCount: { $size: "$followers" }}},
+        { "$addFields": { followingCount: { $size: "$following" }}},
+        { "$addFields": { followed: { $cond: { if: { $in: [targetUserId, "$followers"] }, then: true, else: false } }}},
+        {
+            $facet: {
+                results: [
+                    { $skip: (page - 1) * pageSize },
+                    { $limit: pageSize }
+                ],
+                totalCount: [
+                    { $count: 'count' }
+                ]
+            }
+        }
+    ]);
+
+    const totalCount = users[0].totalCount[0] ? users[0].totalCount[0].count : 0;
+
+    return {
+        results: users[0].results,
+        totalCount, 
+        totalPages: Math.ceil(totalCount / pageSize),
+    };
 }
