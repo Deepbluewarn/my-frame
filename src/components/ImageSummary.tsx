@@ -3,7 +3,6 @@
 import { Button, Flex, Text, TextInput } from "@mantine/core"
 import { useEffect, useRef, useState } from "react";
 import Styles from '@/styles/components/imageDetails.module.css';
-import Link from "next/link";
 
 export default function ImageSummary(
     {
@@ -35,6 +34,11 @@ export default function ImageSummary(
             setEditing(false);
         }
     }
+
+    useEffect(() => {
+        set_Title(title);
+        set_Description(description)
+    }, [title, description])
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
