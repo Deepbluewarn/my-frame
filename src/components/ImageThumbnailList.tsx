@@ -22,14 +22,12 @@ export default function ImageThumbnailList({
         }
 
         return (
-            <>
-                <Box className={cName}>
-                    <Image 
-                        className={Styles.image_thumbnail}
-                        src={l.url} alt={l.title} fill={true} 
-                    />
-                </Box>
-            </>
+            <Box className={cName} key={`${l.url}-${l.title}`}>
+                <Image
+                    className={Styles.image_thumbnail}
+                    src={l.url} alt={l.title} fill={true}
+                />
+            </Box>
         )
     })
 
