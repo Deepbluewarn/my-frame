@@ -35,6 +35,7 @@ export default function ExploreFollowerImages() {
         title: img.title,
         width: img.width,
         height: img.height,
+        ownerDetails: fList.ownerDetails,
       }
     })
 

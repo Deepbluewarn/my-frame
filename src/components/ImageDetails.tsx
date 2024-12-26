@@ -18,6 +18,7 @@ import Comment from '@/components/Comment';
 import StarList from "./StarList";
 import ImageSummary from "./ImageSummary";
 import Link from "next/link";
+import { IGallery } from "./Gallery";
 
 export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
     const { 
@@ -59,6 +60,15 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
 
     if (!current) return null;
 
+    const gallery: IGallery = {
+        _id: current._id,
+        url: current.url,
+        title: current.title,
+        width: current.width,
+        height: current.height,
+        ownerDetails: current.ownerDetails,
+    }
+
     return (
         <Box className={Styles.container}>
             <Box className={Styles.image_container}>
@@ -71,14 +81,13 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                     <IconCircleChevronLeft />
                 </ActionIcon>
                 <GalleryFrame
-                    width={current.width}
-                    height={current.height}
-                    url={current.url}
-                    title={current.title}
-                    description={current.description}
-                    tags={current.tags}
-                    likes={current.likes || []}
+                    gallery={gallery}
                     className={Styles.image}
+                    imageStyle={{
+                        width: '100%', objectFit: 'contain',
+                    }}
+                    overlay={false}
+                    link={false}
                 />
                 <ActionIcon
                     variant="default"
@@ -103,7 +112,7 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
                             radius="xl"
                         />
 
-                        <Flex direction={'column'} gap={8}>
+                        <Flex direction={'column'} gap={8} style={{width: '100%'}}>
                             <Link href={`/user/${current.ownerDetails._id}`} target="_blank">
                                 <Text fw={700}>{current.ownerDetails.username}</Text>
                             </Link>

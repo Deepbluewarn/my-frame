@@ -2,8 +2,8 @@
 
 import { Box } from "@mantine/core";
 import Styles from '@/styles/components/Gallery.module.css';
-import Link from "next/link";
-import Image from "next/image";
+import { UserInterface } from "@/db/models/User";
+import GalleryFrame from "./GalleryFrame";
 
 export interface IGallery {
     _id: string;
@@ -11,29 +11,23 @@ export interface IGallery {
     title: string;
     width: number;
     height: number;
+    ownerDetails: UserInterface;
 }
 
 export default function GalleryComponent({ images }: { images?: IGallery[] }) {
-
     return (
         <Box className={Styles.container}>
-            {images?.map((image, index) => (
-                <Box
-                    key={index}
-                    style={{ '--w': image.width, '--h': image.height }}
-                    className={Styles.image_wrapper}
-                >
-                    <Link href={`/image/${image._id}`}>
-                        <Image 
-                            src={image.url} 
-                            alt={image.title} 
-                            width={image.width}
-                            height={image.height}
-                            className={Styles.image}
-                        />
-                    </Link>
-                    
-                </Box>
+            {images?.map((image) => (
+                <GalleryFrame 
+                    gallery={image} 
+                    imageStyle={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                    }}
+                    overlay={true}
+                    link={true}
+                />
             ))}
         </Box>
     )

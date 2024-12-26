@@ -24,6 +24,7 @@
 .nav_btn {
     position: absolute;
     bottom: 50%;
+    z-index: 1;
 }
 .nav_prev_btn {
     left: 24px;
