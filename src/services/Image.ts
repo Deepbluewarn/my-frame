@@ -460,12 +460,14 @@ export async function getFollowerListWithImages(userSub: string, page: number = 
     ])
 }
 
-export async function searchImages(query: string, page: number = 1, pageSize: number = 10): Promise<SearchResult<ImageInterface>> {
+export async function searchImages(query: string, viewerId?: string, page: number = 1, pageSize: number = 10): Promise<SearchResult<ImageWithOwner>> {
     await dbConnect();
 
     const words = decodeURI(query).split(' ').map(word => new RegExp(word, 'i')); // 'i' for case-insensitive
 
     const images = await Image.aggregate([
+        ...ownerLookupPipeline,
+        ...getVisibilityPipeline(viewerId),
         {
             $match: {
                 $or: [
