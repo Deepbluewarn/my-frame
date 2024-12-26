@@ -105,7 +105,7 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
 
                         <Flex direction={'column'} gap={8}>
                             <Link href={`/user/${current.ownerDetails._id}`} target="_blank">
-                                <Text fw={700}>bluewarn</Text>
+                                <Text fw={700}>{current.ownerDetails.username}</Text>
                             </Link>
 
                             <ImageSummary
