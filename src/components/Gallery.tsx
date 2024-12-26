@@ -25,6 +25,7 @@ export default function GalleryComponent({ images }: { images?: IGallery[] }) {
                         width: '100%',
                         height: '100%',
                     }}
+                    key={image._id}
                     overlay={true}
                     link={true}
                 />
