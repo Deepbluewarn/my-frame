@@ -4,6 +4,7 @@ import { getSession } from "@auth0/nextjs-auth0";
 import MenuAvatar from "./MenuAvatar";
 import { IconUpload } from "@tabler/icons-react";
 import Link from "next/link";
+import SearchInput from "./SearchInput";
 
 export default async function Header({ fixed = true }: { fixed?: boolean }) {
     const session = await getSession();
@@ -22,6 +23,7 @@ export default async function Header({ fixed = true }: { fixed?: boolean }) {
                         user ? (
                             <>
                                 <Flex gap={32}>
+                                    <SearchInput />
                                     <Link href={'/explore/public'} className={Styles['centered-link']}>탐색</Link>
                                     <Link href={'/explore/follow'} className={Styles['centered-link']}>팔로우</Link>
                                     <Link href='/upload' className={Styles['centered-link']}><IconUpload /></Link>
