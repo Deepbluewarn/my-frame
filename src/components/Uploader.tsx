@@ -2,7 +2,7 @@
 
 import { UploadAction } from "@/actions/upload/upload";
 import { UploadContext } from "@/context/UploadContext";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ImageInterface } from "@/interface/Upload";
 import { hashFile, formatFileSize } from "@/utils/file";
 import ImageFrame from "./ImageFrame";
@@ -11,8 +11,9 @@ import { Button, Paper } from "@mantine/core";
 
 export default function Uploader() {
     const uploadContext = useContext(UploadContext);
-    const uploadActionWithMatadata = UploadAction.bind(null, uploadContext.imageFiles);
+    const uploadActionWithMatadata = UploadAction.bind(null, uploadContext.imageObjects);
     const [ uploadLoading, setUploadLoading ] = React.useState(false);
+    const [ imageFiles, setImageFiles ] = useState<Map<string, File>>(new Map<string, File>());
     
     const onFileChanged = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files: FileList | null = e.target.files;
@@ -33,7 +34,18 @@ export default function Uploader() {
             }
         })
 
-        uploadContext.setImageFiles(old => {
+        setImageFiles(old => {
+            const _files = Array.from(files);
+
+            console.log('Uploader _files: ', _files)
+
+            _files.forEach(f => {
+                old.set(f.name, f);
+            })
+            return new Map(old);
+        })
+
+        uploadContext.setImageObjects(old => {
             if (!old) return Images;
 
             Images.forEach(e => {
@@ -50,7 +62,7 @@ export default function Uploader() {
         const target = e.target as HTMLElement;
 
         if (target.closest('button')) {
-            uploadContext.setImageFiles(old => {
+            uploadContext.setImageObjects(old => {
                 if (!old) return old;
 
                 return old.filter(e => e.key !== imageKey);
@@ -69,24 +81,26 @@ export default function Uploader() {
 
         const form = e.target as HTMLFormElement;
         const fileInput = form.querySelector<HTMLInputElement>('#selectFile');
-
-        if (!fileInput || !fileInput.files) return;
-        if (!uploadContext.imageFiles) return;
+        if (!uploadContext.imageObjects) return;
 
         setUploadLoading(true);
 
         const data = new FormData();
 
-        for (const file of Array.from(fileInput.files)) {
-            data.append(encodeURIComponent(file.name), file);
+        for (const file of Array.from(imageFiles)) {
+            data.append(encodeURIComponent(file[1].name), file[1]);
         }
         const res = await uploadActionWithMatadata(data);
 
         if (res && res.success) {
             alert('업로드에 성공했습니다.');
-            uploadContext.setImageFiles([]);
+            uploadContext.setImageObjects([]);
+            if (fileInput) {
+                fileInput.value = '';
+                setImageFiles(new Map())
+            }
         } else {
-            alert('업로드에 실패했습니다. ' +  res?.error ?? "");
+            alert('업로드에 실패했습니다. ' +  (res?.error ?? ""));
         }
 
         setUploadLoading(false);
@@ -117,15 +131,15 @@ export default function Uploader() {
                         사진 선택
                     </Button>
                     {
-                        uploadContext.imageFiles && uploadContext.imageFiles.length > 0 ? (
+                        uploadContext.imageObjects && uploadContext.imageObjects.length > 0 ? (
                             <Button
                                 component='label'
                                 htmlFor="submit_files"
                             >
                                 {
                                     uploadLoading ? 
-                                        `${uploadContext.imageFiles.length}개 업로드 중...` : 
-                                        `${uploadContext.imageFiles.length}개 업로드`
+                                        `${uploadContext.imageObjects.length}개 업로드 중...` : 
+                                        `${uploadContext.imageObjects.length}개 업로드`
                                 }
                             </Button>
                         ) : null
@@ -135,7 +149,7 @@ export default function Uploader() {
 
             <div className={Styles.imageFrameContainer}>
                 {
-                    uploadContext.imageFiles?.map(e =>
+                    uploadContext.imageObjects?.map(e =>
                         <div key={e.key} onClick={(ev) => imageClicked(ev, e.key)}>
                         <ImageFrame
                             selected={e.key === uploadContext.selectedFileKey}

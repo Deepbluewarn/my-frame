@@ -14,17 +14,17 @@ function findImageFile(targetFileKey: string, images: ImageInterface[]) {
 export default function ImageMetadataEditor() {
     const uploadContext = useContext(UploadContext);
     const { 
-        selectedFileKey, imageFiles, 
+        selectedFileKey, imageObjects, 
         updateName, addTags, removeTag, 
         updateDescription, updateVisibility,
     } = uploadContext;
     const [inputTagStr, setInputTagStr] = useState('');
 
-    if (!imageFiles || selectedFileKey === null) {
+    if (!imageObjects || selectedFileKey === null) {
         return <Text>이미지를 선택하세요</Text>
     }
 
-    const image = findImageFile(selectedFileKey, imageFiles)
+    const image = findImageFile(selectedFileKey, imageObjects)
 
     const onImageNameChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
         const target = e.currentTarget;

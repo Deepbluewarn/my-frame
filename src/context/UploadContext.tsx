@@ -3,8 +3,8 @@ import { ImageInterface } from "@/interface/Upload";
 import React, { createContext, Dispatch, SetStateAction, useState } from "react";
 
 interface UploadContext {
-    imageFiles: ImageInterface[] | null,
-    setImageFiles: Dispatch<SetStateAction<ImageInterface[] | null>>
+    imageObjects: ImageInterface[] | null,
+    setImageObjects: Dispatch<SetStateAction<ImageInterface[] | null>>
     selectedFileKey: string | null
     setSelectedFileKey: Dispatch<SetStateAction<string | null>>
     addTags: (fileKey: string, newTags: string[]) => void
@@ -15,8 +15,8 @@ interface UploadContext {
 }
 
 const defaultUploadContext: UploadContext = {
-    imageFiles: null,
-    setImageFiles: () => {},
+    imageObjects: null,
+    setImageObjects: () => {},
     selectedFileKey: null,
     setSelectedFileKey: () => {},
     addTags: () => {},
@@ -29,11 +29,11 @@ const defaultUploadContext: UploadContext = {
 export const UploadContext = createContext(defaultUploadContext);
 
 export const UploadProvider = ({children}: {children: React.ReactNode}) => {
-    const [imageFiles, setImageFiles] = useState<ImageInterface[] | null>(null);
+    const [imageObjects, setImageObjects] = useState<ImageInterface[] | null>(null);
     const [selectedFileKey, setSelectedFileKey] = useState<string | null>(null); // 파일 이름으로 선택
 
     const updateImageFiles = (update: (newValues: ImageInterface[]) => ImageInterface[]) => {
-        setImageFiles(prev => {
+        setImageObjects(prev => {
             if (!prev) return prev;
 
             return update(prev);
@@ -103,7 +103,7 @@ export const UploadProvider = ({children}: {children: React.ReactNode}) => {
     }
 
     const context: UploadContext = {
-        imageFiles, setImageFiles,
+        imageObjects, setImageObjects,
         selectedFileKey, setSelectedFileKey,
         addTags, removeTag, updateName,
         updateDescription, updateVisibility
