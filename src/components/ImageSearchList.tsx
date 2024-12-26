@@ -2,13 +2,13 @@
 
 import { SearchResult } from "@/services/types";
 import { useEffect, useState } from "react";
-import { Box, Flex, Group, Pagination, Stack, Text } from '@mantine/core';
+import { Pagination, Stack, Text } from '@mantine/core';
 import { actionSearchImages } from "@/actions/image";
-import { ImageInterface } from "@/db/models/Image";
 import GalleryComponent from "./Gallery";
+import { ImageWithOwner } from "@/services/Image";
 
 export default function ImageSearchList({ query } : { query: string }) {
-    const [images, setImages] = useState<SearchResult<ImageInterface>>();
+    const [images, setImages] = useState<SearchResult<ImageWithOwner>>();
     const [page, setPage] = useState(1);
 
     useEffect(() => {
