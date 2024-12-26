@@ -5,8 +5,8 @@ import { decodeJwt } from "@/utils/jwt";
 import { JwtPayload } from "jsonwebtoken";
 import { redirect } from "next/navigation";
 
-function redirectToContinue(state: string, success: boolean) {
-    redirect(`${process.env.AUTH0_ISSUER_BASE_URL}/continue?state=${state}&dbSuccess=${success}`);
+function redirectToContinue(state: string, success: boolean, baseURL?: string) {
+    redirect(`${process.env.AUTH0_ISSUER_BASE_URL}/continue?state=${state}&dbSuccess=${success}&baseURL=${baseURL}`);
 }
 export default async function Landing({
     searchParams,
@@ -15,11 +15,12 @@ export default async function Landing({
 }) {
     const state = searchParams.state;
     const token = searchParams.session_token;
+    const baseURL = process.env.AUTH0_BASE_URL;
     let success = false;
 
     const payload = decodeJwt(token as string) as JwtPayload;
 
-    if (!payload) redirectToContinue(state as string, success);
+    if (!payload) redirectToContinue(state as string, success, baseURL);
 
     const sub = payload!.user_id;
     const username = payload!.nickname || payload!.name;
@@ -46,6 +47,6 @@ export default async function Landing({
         console.error('Landing 실패: ', e);
         success = false;
     } finally {
-        redirectToContinue(state as string, success);
+        redirectToContinue(state as string, success, baseURL);
     }
 }

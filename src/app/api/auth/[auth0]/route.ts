@@ -4,6 +4,7 @@ export const GET = handleAuth({
     login: handleLogin({
         authorizationParams: {
             prompt: 'login',
+            baseURL: process.env.AUTH0_BASE_URL,
         }
     }),
     signup: handleLogin({
