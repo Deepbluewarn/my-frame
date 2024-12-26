@@ -149,5 +149,6 @@ export async function actionGetFollowerListWithImages(page: number = 1) {
 }
 
 export async function actionSearchImages(query: string, page: number = 1, pageSize: number = 10) {
-    return await searchImages(query, page, pageSize);
+    const viewerId = await actionGetUserIdBySub();
+    return await searchImages(query, viewerId, page, pageSize);
 }
