@@ -1,7 +1,7 @@
 .container {
     --space: 8px;
     --min-height: 240px;
-    --last-row-background: rgb(188 234 153);
+    --last-row-background: rgba(255, 255, 255, 0);
 }
 
 .container {
