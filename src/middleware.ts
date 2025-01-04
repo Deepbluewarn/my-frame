@@ -1,6 +1,8 @@
-import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
+import withMiddlewareAuthRequired from '@/middlewares/auth'
+import { chain } from './middlewares/chain';
+import { withLoggerMiddleware } from './middlewares/logger';
 
-export default withMiddlewareAuthRequired();
+export default chain([withMiddlewareAuthRequired, withLoggerMiddleware]);
 
 export const config = {
   matcher: [

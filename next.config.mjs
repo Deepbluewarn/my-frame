@@ -6,7 +6,11 @@ const nextConfig = {
                 'localhost:3001',
                 'wv93m9tn-3001.asse.devtunnels.ms'
             ]
-        }
+        },
+        serverComponentsExternalPackages: [
+            'pino',
+            'pino-pretty'
+        ]
     },
     webpack: (config, { isServer }) => {
         if (!isServer) {
