@@ -1,34 +1,17 @@
-import { ImageWithOwnerPagination } from "@/hooks/useImageList";
-import { Box, Flex, stylesToString } from "@mantine/core";
-import Image from "next/image";
-import Styles from '@/styles/components/ImageThumbnailList.module.css';
+import { Flex } from "@mantine/core";
+import { ImageWithOwner } from "@/services/Image";
+import ImageThumbnail from "./ImageThumbnail";
 
 export default function ImageThumbnailList({
     list, currentImageId
 } : {
-    list: (ImageWithOwnerPagination | undefined)[],
-    currentImageId: string
+    list: (ImageWithOwner | undefined)[],
+    currentImageId?: string,
 }) {
-
-    console.log(list)
     const imageList = list.map((l, idx) => {
         if (!l) return;
 
-        let cName = `${Styles.image_wrapper}`
-
-        if (l._id === currentImageId) {
-            console.log(l)
-            cName += ` ${Styles.current}`
-        }
-
-        return (
-            <Box className={cName} key={`${l.url}-${l.title}`}>
-                <Image
-                    className={Styles.image_thumbnail}
-                    src={l.url} alt={l.title} fill={true}
-                />
-            </Box>
-        )
+        return <ImageThumbnail image={l} current={l._id === currentImageId}/>
     })
 
     return (

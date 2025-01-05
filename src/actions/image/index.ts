@@ -13,19 +13,22 @@ import {
     getPublicImages, 
     getSurroundingImagesById,
     getUserImages,
+    getUserImagesByDate,
     removeImageComment,
     removeImageStar,
     removeImageTag,
     searchImages,
+    updateImagesMetadata,
     updateImageTitleAndDescription, 
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
-import { IComment } from "@/db/models/Image";
+import { IComment, Visibility } from "@/db/models/Image";
 import { getSession } from "@auth0/nextjs-auth0";
 
 export interface ImagePaginationParams {
     limit?: number;
     last_image_id?: string;
+    last_image_date?: number;
 }
 
 export interface UserImagePaginationParams extends ImagePaginationParams {
@@ -40,6 +43,11 @@ export async function actionGetImageById(_id: string) {
 export async function actionGetUserImages(params: UserImagePaginationParams) {
     const viewerId = await actionGetUserIdBySub();
     return await getUserImages(params.limit, params.user_id, viewerId, params.last_image_id);
+}
+
+export async function actionGetUserImagesByDate(params: UserImagePaginationParams) {
+    const viewerId = await actionGetUserIdBySub();
+    return await getUserImagesByDate(params.limit, params.user_id, viewerId, params.last_image_date);
 }
 
 export async function actionGetPublicImages(params: ImagePaginationParams) {
@@ -85,6 +93,15 @@ export async function actionRemoveImageTag(_id: string, tag: string) {
     }
 
     return await removeImageTag(_id, tag);
+}
+
+export async function actionUpdateImagesMetadata(
+    imageIds: string[], title?: string, description?: string, tags?: string[],
+    visibility?: Visibility,
+) {
+    return (await updateImagesMetadata(
+        imageIds, title, description, tags, visibility
+    )).acknowledged;
 }
 
 export async function actionAddImageComment(_id: string, comment: string) {

@@ -1,7 +1,7 @@
 'use server'
 
 import dbConnect from "@/db/init";
-import Image, { IComment, ImageInterface } from "@/db/models/Image";
+import Image, { IComment, ImageInterface, Visibility } from "@/db/models/Image";
 import { HydratedDocument, PipelineStage } from "mongoose";
 import { getUserById, getUserBySub, ownerLookupPipeline } from "./User";
 import User, { IUserInfo, UserInterface } from "@/db/models/User";
@@ -167,6 +167,44 @@ export async function getUserImages(limit: number = 10, userId: string, viewerId
     ])
 }
 
+export async function getUserImagesByDate(limit: number = 10, userId: string, viewerId?: string, lastImageDate?: number): Promise<[number, ImageWithOwner[]][]> {
+    await dbConnect();
+
+    const matchStage: PipelineStage.Match = {
+        $match: {
+            owner: userId,
+            ...(lastImageDate && { uploadedAt: { $lt: new Date(lastImageDate) } })
+        }
+    };
+
+    const groupStage: PipelineStage.Group = {
+        $group: {
+            _id: {
+                $dateToString: { format: "%Y-%m-%d", date: "$uploadedAt" }
+            },
+            images: { $push: "$$ROOT" }
+        }
+    };
+
+    const sortStage: PipelineStage.Sort = {
+        $sort: { "_id": -1 }
+    };
+
+    const limitStage: PipelineStage.Limit = {
+        $limit: limit
+    };
+
+    const pipeline = [
+        ...ownerLookupPipeline,
+        ...getVisibilityPipeline(viewerId),
+        matchStage, groupStage, sortStage, limitStage
+    ];
+
+    const result = await Image.aggregate<{_id: string, images: ImageWithOwner[]}>(pipeline);
+
+    return result.map(group => [new Date(group._id).getTime(), group.images]);
+}
+
 export async function addImageTags(imageId: string, tags: string[]) {
     await dbConnect();
 
@@ -183,6 +221,24 @@ export async function removeImageTag(imageId: string, tag: string) {
         { _id: imageId },
         { $pull: { tags: tag } }
     )
+}
+
+export async function updateImagesMetadata(
+    imageIds: string[], title?: string, description?: string, tags?: string[],
+    visibility?: Visibility,
+) {
+    await dbConnect();
+
+    const updateFields: any = {};
+    if (title) updateFields.title = title;
+    if (description) updateFields.description = description;
+    if (tags && Array.isArray(tags)) updateFields.tags = { $each: tags };
+    if (visibility) updateFields.visibility = visibility;
+
+    return await Image.updateMany(
+        { _id: { $in: imageIds } },
+        { $set: updateFields }
+    );
 }
 
 export async function addImageComment(imageId: string, commenterId: string, comment: string) {
