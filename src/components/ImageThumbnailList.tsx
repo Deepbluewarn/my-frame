@@ -11,7 +11,7 @@ export default function ImageThumbnailList({
     const imageList = list.map((l, idx) => {
         if (!l) return;
 
-        return <ImageThumbnail image={l} current={l._id === currentImageId}/>
+        return <ImageThumbnail key={l._id} image={l} current={l._id === currentImageId}/>
     })
 
     return (

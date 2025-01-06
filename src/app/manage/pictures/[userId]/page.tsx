@@ -73,6 +73,7 @@ export default function ManagePictures({ params }: { params: { userId: string } 
                                                 const selected = selectedImageList.some(i => i._id === image._id);
                                                 return (
                                                     <ImageThumbnail
+                                                        key={image._id}
                                                         image={image}
                                                         size={80}
                                                         selected={selected}
