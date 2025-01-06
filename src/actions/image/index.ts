@@ -4,6 +4,7 @@ import {
     addImageComment,
     addImageStar,
     addImageTags,
+    deleteImages,
     getFollowerListWithImages,
     getImageById, 
     getImageComments, 
@@ -168,4 +169,8 @@ export async function actionGetFollowerListWithImages(page: number = 1) {
 export async function actionSearchImages(query: string, page: number = 1, pageSize: number = 10) {
     const viewerId = await actionGetUserIdBySub();
     return await searchImages(query, viewerId, page, pageSize);
+}
+
+export async function actionDeleteImages(imageIds: string[]) {
+    return await deleteImages(imageIds);
 }

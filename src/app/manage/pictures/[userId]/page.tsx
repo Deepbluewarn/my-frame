@@ -9,11 +9,19 @@ import ImageThumbnail from '@/components/ImageThumbnail';
 import { useImageSelection } from '@/hooks/useImageSelection';
 import { useDisclosure } from '@mantine/hooks';
 import EditImageMetadata from '@/components/EditImageMetadata';
+import DeleteConfirmation from '@/components/DeleteConfirmation';
 
 export default function ManagePictures({ params }: { params: { userId: string } }) {
     const [imageGroupedByTime, setImageGroupedByTime] = useState<[time: number, images: ImageWithOwner[]][]>([]);
     const { selectedImageList, toggleSelection, reset } = useImageSelection();
-    const [opened, { open, close }] = useDisclosure(false);
+    const [editModalOpened, { open: openEditModal, close: closeEditModal }] = useDisclosure(false);
+    const [
+        deleteConfirmModalOpened, 
+        { 
+            open: openDeleteConfirmModal, 
+            close: closeDeleteConfirmModal 
+        }
+    ] = useDisclosure(false);
 
     useEffect(() => {
         const asyncFn = async () => {
@@ -40,10 +48,23 @@ export default function ManagePictures({ params }: { params: { userId: string } 
 
     return (
         <>
-            <Modal opened={opened} onClose={close} title="사진 편집">
-                <EditImageMetadata selectedImages={selectedImageList} done={() => {
-                    close();
+            <Modal opened={editModalOpened} onClose={closeEditModal} title="사진 편집">
+                <EditImageMetadata selectedImages={selectedImageList} done={(refresh) => {
+                    if (refresh) {
+                        location.reload();
+                    }
+                    closeEditModal();
                     reset();
+                }} />
+            </Modal>
+
+            <Modal opened={deleteConfirmModalOpened} onClose={closeDeleteConfirmModal} title="사진 삭제 확인">
+                <DeleteConfirmation selectedImages={selectedImageList} done={(refresh) => {
+                    console.log(refresh)
+                    if (refresh) {
+                        location.reload();
+                    }
+                    closeDeleteConfirmModal();
                 }} />
             </Modal>
 
@@ -55,8 +76,8 @@ export default function ManagePictures({ params }: { params: { userId: string } 
                             {
                                 selectedImageList.length > 0 ? (
                                     <Flex gap={8}>
-                                        <Button onClick={open}>편집</Button>
-                                        <Button color='red'>삭제</Button>
+                                        <Button onClick={openEditModal}>편집</Button>
+                                        <Button onClick={openDeleteConfirmModal} color='red'>삭제</Button>
                                     </Flex>
                                 ) : null
                             }

@@ -554,3 +554,11 @@ export async function searchImages(query: string, viewerId?: string, page: numbe
         totalPages: Math.ceil(totalCount / pageSize),
     };
 }
+
+export async function deleteImages(imageIds: string[]) {
+    await dbConnect();
+
+    return (await Image.deleteMany({
+        _id: { $in: imageIds }
+    })).acknowledged;
+}

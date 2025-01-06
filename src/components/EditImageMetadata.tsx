@@ -11,7 +11,7 @@ export default function EditImageMetadata(
         selectedImages, done
     }: 
     {
-        selectedImages: ImageWithOwner[], done: () => void,
+        selectedImages: ImageWithOwner[], done: (refresh?: boolean) => void,
     }
 ) {
     const [title, setTitle] = useState<string>();
@@ -68,7 +68,7 @@ export default function EditImageMetadata(
 
         if (res) {
             alert('사진을 성공적으로 업데이트했습니다.')
-            done();
+            done(true);
         }
     }
 
@@ -130,7 +130,7 @@ export default function EditImageMetadata(
             </Chip.Group>
 
             <Flex justify='flex-end' gap={16}>
-                <Button onClick={done} color="gray">취소</Button>
+                <Button onClick={() => done()} color="gray">취소</Button>
                 <Button onClick={() => updateMetadata()}>저장</Button>
             </Flex>
         </Flex>
