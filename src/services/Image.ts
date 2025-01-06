@@ -232,12 +232,17 @@ export async function updateImagesMetadata(
     const updateFields: any = {};
     if (title) updateFields.title = title;
     if (description) updateFields.description = description;
-    if (tags && Array.isArray(tags)) updateFields.tags = { $each: tags };
     if (visibility) updateFields.visibility = visibility;
+
+    const updateQuery: any = { $set: updateFields };
+    
+    if (tags && Array.isArray(tags)) {
+        updateQuery.$addToSet = { tags: { $each: tags } };
+    }
 
     return await Image.updateMany(
         { _id: { $in: imageIds } },
-        { $set: updateFields }
+        updateQuery
     );
 }
 
