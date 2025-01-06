@@ -18,7 +18,7 @@
     background-color: #212121;
     padding: 32px 20px;
     max-height: var(--image-max-height);
-    min-height: var(--image-min-height);
+    /* min-height: var(--image-min-height); */
 }
 
 .nav_btn {
@@ -34,8 +34,9 @@
 }
 
 .image {
-    max-height: calc(var(--image-max-height) - var(--thumbnail-height));
+    /* max-height: calc(var(--image-max-height) - var(--thumbnail-height)); */
     padding: 32px 8px;
+    height: 100%;
 }
 
 .image_thumbnail_list {
