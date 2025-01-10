@@ -34,3 +34,28 @@
     align-items: center;
     justify-content: center;
 }
+
+.drawer_item {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    padding-left: var(--mantine-spacing-md);
+    padding-right: var(--mantine-spacing-md);
+    text-decoration: none;
+    color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+    font-weight: 500;
+    font-size: var(--mantine-font-size-sm);
+}
+
+.drawer_item:hover {
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+}
+
+.avatar {
+    height: inherit;
+    padding: var(--mantine-spacing-md);
+}
+
+.avatar_logout {
+    margin-left: auto;
+}

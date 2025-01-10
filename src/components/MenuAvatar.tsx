@@ -1,5 +1,5 @@
-import { getUserBySub } from '@/services/User';
-import { getSession } from '@auth0/nextjs-auth0';
+'use client'
+
 import { Avatar, Menu, MenuDivider, MenuDropdown, MenuItem, MenuLabel, MenuTarget, Text, rem } from '@mantine/core';
 import {
     IconPhoto,
@@ -7,29 +7,28 @@ import {
 } from '@tabler/icons-react';
 import Link from 'next/link';
 
-export default async function MenuAvatar() {
-    const session = await getSession();
-    const user = session?.user;
-
-    if (!user) {
-        return null
+export default function MenuAvatar(
+    { 
+        userId, userPicture, userName
+    } : 
+    { 
+        userId: string,
+        userPicture: string,
+        userName: string
     }
-    const userInfo = await getUserBySub(user.sub);
-
-    if (!userInfo) return null;
-
+) {
     return (
         <Menu shadow="md" width={200}>
             <MenuTarget>
-                <Avatar src={user.picture} alt={user.name} />
+                <Avatar src={userPicture} alt={userName} />
             </MenuTarget>
 
             <MenuDropdown>
                 <MenuItem leftSection={<IconPhoto style={{ width: rem(14), height: rem(14) }} />}>
-                    <Link href={`/user/${userInfo._id}`}>내 사진</Link>
+                    <Link href={`/user/${userId}`}>내 사진</Link>
                 </MenuItem>
                 <MenuItem>
-                    <Link href={`/manage/pictures/${userInfo._id}`}>사진 관리</Link>
+                    <Link href={`/manage/pictures/${userId}`}>사진 관리</Link>
                 </MenuItem>
 
                 <MenuDivider />

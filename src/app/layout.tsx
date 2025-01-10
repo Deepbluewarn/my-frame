@@ -4,7 +4,7 @@ import '@mantine/dropzone/styles.css';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import type { Metadata } from "next";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
-import Header from '@/components/Header';
+import Header from '@/components/Header/Header';
 import HomeStyles from '@/styles/home.module.css'
 import { IconMail, IconBrandGithub } from '@tabler/icons-react';
 import { getSession } from '@auth0/nextjs-auth0';
