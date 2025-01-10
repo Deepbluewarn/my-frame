@@ -40,7 +40,10 @@ export default function ImageThumbnail(
             </Box>
             <Image
                 className={Styles.image_thumbnail}
-                src={image.url} alt={image.title} fill={true}
+                src={image.url} 
+                alt={image.title}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                fill priority
             />
         </Flex>
     )
