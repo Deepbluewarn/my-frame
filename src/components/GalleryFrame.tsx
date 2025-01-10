@@ -12,12 +12,14 @@ export default function GalleryFrame({
   imageStyle,
   className,
   overlay, link,
+  resize = false,
 }: {
   gallery: IGallery,
   imageStyle?: CSSProperties,
   className?: string,
   overlay: boolean,
   link: boolean,
+  resize?: boolean,
 }) {
   const [overlayVisible, setOverlayVisible] = useState(false);
   const resized = resizeWithRatio(gallery.width, gallery.height);
@@ -54,8 +56,8 @@ export default function GalleryFrame({
       <Image
         src={gallery.url}
         alt={gallery.title}
-        width={resized[0]}
-        height={resized[1]}
+        width={resize ? resized[0] : gallery.width}
+        height={resize ? resized[1] : gallery.height}
         style={imageStyle}
         className={className}
         placeholder='blur'

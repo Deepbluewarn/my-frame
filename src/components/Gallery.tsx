@@ -28,6 +28,7 @@ export default function GalleryComponent({ images }: { images?: IGallery[] }) {
                     key={image._id}
                     overlay={true}
                     link={true}
+                    resize={true}
                 />
             ))}
         </Box>
