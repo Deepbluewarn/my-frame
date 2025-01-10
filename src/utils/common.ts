@@ -13,3 +13,13 @@ export function listFormat(list: string[], head_length: number = 4) {
 
     return formattedNames;
 }
+
+export function resizeWithRatio(w: number, h: number, maxWidth: number = 500) {
+    if (w <= maxWidth) {
+      return [w, h];
+    } else {
+      const r = w / maxWidth
+      return [w / r, h / r]
+    }
+  }
+  

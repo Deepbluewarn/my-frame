@@ -1,6 +1,6 @@
 .container {
     --space: 8px;
-    --min-height: 240px;
+    --min-height: 160px;
     --last-row-background: rgba(255, 255, 255, 0);
 }
 

@@ -5,6 +5,7 @@ import { Avatar, Box, Flex, Text } from '@mantine/core';
 import { IGallery } from './Gallery';
 import { IconStar } from '@tabler/icons-react';
 import Link from 'next/link';
+import { resizeWithRatio } from '@/utils/common';
 
 export default function GalleryFrame({
   gallery,
@@ -19,6 +20,7 @@ export default function GalleryFrame({
   link: boolean,
 }) {
   const [overlayVisible, setOverlayVisible] = useState(false);
+  const resized = resizeWithRatio(gallery.width, gallery.height);
 
   const onMouseEnterHandler = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (overlay) {
@@ -52,16 +54,18 @@ export default function GalleryFrame({
       <Image
         src={gallery.url}
         alt={gallery.title}
-        width={gallery.width}
-        height={gallery.height}
+        width={resized[0]}
+        height={resized[1]}
         style={imageStyle}
         className={className}
+        placeholder='blur'
+        blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBAB  bWyZJf74GZgAAAABJRU5ErkJggg=="
       />
     </>
   )
   return (
     <Box
-      style={{ '--w': gallery.width, '--h': gallery.height, width: '100%' }}
+      style={{ '--w': resized[0], '--h': resized[1], width: '100%' }}
       className={Styles.image_wrapper}
       onMouseEnter={onMouseEnterHandler}
       onMouseLeave={onMouseLeaveHandler}
