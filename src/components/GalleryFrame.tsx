@@ -1,11 +1,12 @@
 import Image from 'next/image'
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useState } from 'react';
 import Styles from '@/styles/components/Gallery.module.css';
 import { Avatar, Box, Flex, Text } from '@mantine/core';
 import { IGallery } from './Gallery';
-import { IconStar } from '@tabler/icons-react';
+import { IconStar, IconStarFilled } from '@tabler/icons-react';
 import Link from 'next/link';
 import { resizeWithRatio } from '@/utils/common';
+import { actionAddImageStar, actionHasUserLikedImage, actionRemoveImageStar } from '@/actions/image';
 
 export default function GalleryFrame({
   gallery,
@@ -21,67 +22,87 @@ export default function GalleryFrame({
   link: boolean,
   resize?: boolean,
 }) {
-  const [overlayVisible, setOverlayVisible] = useState(false);
   const resized = resizeWithRatio(gallery.width, gallery.height);
+  const [star, setStar] = useState<boolean>(false);
 
-  const onMouseEnterHandler = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    if (overlay) {
-      setOverlayVisible(true);
+  useEffect(() => {
+    const asyncFn = async() => {
+      const star = await actionHasUserLikedImage(gallery._id);
+      if (typeof star === 'undefined') {
+        return;
+      }
+      setStar(star)
     }
-  };
+    asyncFn();
+  }, [])
 
-  const onMouseLeaveHandler = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    if (overlay) {
-      setOverlayVisible(false);
+  const onStarClicked = useCallback(async () => {
+    let res;
+
+    if (typeof star !== 'undefined' && star) {
+      res = await actionRemoveImageStar(gallery._id);
+    } else {
+      res = await actionAddImageStar(gallery._id);
     }
-  };
-  const overlayContent = (
+
+    if (res) {
+      setStar(res.star);
+    }
+  }, [star])
+
+  return (
     <>
-      <Box className={`${Styles.overlay} ${overlayVisible ? Styles.visible : ''}`}>                        <Flex className={Styles.overlay_foot}>
-        <Flex direction='column' gap={8} className={Styles.overlay_foot_left}>
-          <Text className={Styles.overlay_title}>{gallery.title}</Text>
-          <Flex gap={8}>
+      <Box
+        style={{ '--w': resized[0], '--h': resized[1], width: '100%' }}
+        className={Styles.image_wrapper}
+      >
+        <Box className={`${Styles.overlay_top} ${Styles.overlay}`}>
+          <Flex gap={8} p={10} align='center'>
             <Avatar
               size="sm"
               src={gallery.ownerDetails.profilePicture}
               alt={gallery.ownerDetails.username}
               radius="xl"
             />
-            <Text>{gallery.ownerDetails.username}</Text>
+            <Link href={`/user/${gallery.ownerDetails._id}`}>
+              <Text fw={500} size="sm">{gallery.ownerDetails.username}</Text>
+            </Link>
           </Flex>
-        </Flex>
-        <IconStar className={Styles.star} />
-      </Flex>
+        </Box>
+        <Box className={`${Styles.overlay_bottom} ${Styles.overlay}`}>
+          <Flex p={10}>
+            <Text
+              fw={500}
+              size="sm"
+              className={Styles.overlay_title}
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+            >
+              {gallery.title}
+            </Text>
+            {
+              star ? (
+                <IconStarFilled className={Styles.star} onClick={onStarClicked} />
+              ) : (
+                <IconStar className={Styles.star} onClick={onStarClicked} />
+              )
+            }
+          </Flex>
+        </Box>
+        <Link href={link ? `/image/${gallery._id}` : '#'} >
+          <Image
+            src={gallery.url}
+            alt={gallery.title}
+            width={resize ? resized[0] : gallery.width}
+            height={resize ? resized[1] : gallery.height}
+            style={imageStyle}
+            className={className}
+            placeholder='blur'
+            blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBAB  bWyZJf74GZgAAAABJRU5ErkJggg=="
+          />
+        </Link>
       </Box>
-      <Image
-        src={gallery.url}
-        alt={gallery.title}
-        width={resize ? resized[0] : gallery.width}
-        height={resize ? resized[1] : gallery.height}
-        style={imageStyle}
-        className={className}
-        placeholder='blur'
-        blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBAB  bWyZJf74GZgAAAABJRU5ErkJggg=="
-      />
     </>
-  )
-  return (
-    <Box
-      style={{ '--w': resized[0], '--h': resized[1], width: '100%' }}
-      className={Styles.image_wrapper}
-      onMouseEnter={onMouseEnterHandler}
-      onMouseLeave={onMouseLeaveHandler}
-      onTouchStart={onMouseEnterHandler}
-      onTouchEnd={onMouseLeaveHandler}
-    >
-      {
-        link ? (
-          <Link href={link ? `/image/${gallery._id}` : '#'}>
-            {overlayContent}
-          </Link>
-        ) : overlayContent
-      }
-
-    </Box>
   )
 }

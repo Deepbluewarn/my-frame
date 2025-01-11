@@ -358,6 +358,12 @@ export async function removeImageComment(imageId: string, commentId: string) {
     );
 }
 
+export async function hasUserLikedImage(imageId: string, viewerId: string) {
+    await dbConnect();
+    const like = await Image.findOne({ _id: imageId, owner: viewerId })
+    return !!like;
+}
+
 export async function getImageStarList(imageId: string): Promise<IUserInfo[]> {
     const res = await Image.aggregate([
         { $match: { _id: imageId } },
@@ -393,8 +399,8 @@ export async function getImageStarList(imageId: string): Promise<IUserInfo[]> {
 
 // 좋아요를 추가 또는 취소한 유저의 IUserInfo 객체를 반환.
 // 실패시 null 반환.
-export async function addImageStar(imageId: string, userSub: string): Promise<IUserInfo | null> {
-    const user = await getUserBySub(userSub);
+export async function addImageStar(imageId: string, viewerId: string): Promise<{userInfo: IUserInfo, star: boolean} | null> {
+    const user = await getUserById(viewerId);
 
     if (!user) {
         throw new Error('좋아요 추가에 실패했습니다. 회원 정보를 찾을 수 없습니다.')
@@ -402,22 +408,25 @@ export async function addImageStar(imageId: string, userSub: string): Promise<IU
 
     const res = await Image.updateOne(
         { _id: imageId },
-        { $addToSet: { likes: user._id } }
+        { $addToSet: { likes: viewerId } }
     )
 
-    if (res.acknowledged && res.modifiedCount > 0) {
+    if (res.acknowledged) {
         return {
-            profilePicture: user.profilePicture!,
-            username: user.username!,
-            sub: user.sub!
+            userInfo: {
+                profilePicture: user.profilePicture!,
+                username: user.username!,
+                sub: user.sub!
+            },
+            star: true
         }
     } else {
         return null;
     }
 }
 
-export async function removeImageStar(imageId: string, userSub: string): Promise<IUserInfo | null> {
-    const user = await getUserBySub(userSub);
+export async function removeImageStar(imageId: string, viewerId: string): Promise<{userInfo: IUserInfo, star: boolean} | null> {
+    const user = await getUserById(viewerId);
 
     if (!user) {
         throw new Error('좋아요 취소에 실패했습니다. 회원 정보를 찾을 수 없습니다.')
@@ -428,11 +437,14 @@ export async function removeImageStar(imageId: string, userSub: string): Promise
         { $pull: { likes: user._id } }
     )
 
-    if (res.acknowledged && res.modifiedCount > 0) {
+    if (res.acknowledged) {
         return {
-            profilePicture: user.profilePicture!,
-            username: user.username!,
-            sub: user.sub!
+            userInfo: {
+                profilePicture: user.profilePicture!,
+                username: user.username!,
+                sub: user.sub!
+            },
+            star: false
         }
     } else {
         return null;

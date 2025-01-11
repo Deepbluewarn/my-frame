@@ -66,6 +66,7 @@ export default function ImageDetails({ images }: { images: ImageWithOwner[] }) {
         title: current.title,
         width: current.width,
         height: current.height,
+        likes: current.likes,
         ownerDetails: current.ownerDetails,
     }
 

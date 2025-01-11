@@ -189,27 +189,19 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     }
 
     const addStar = async (userSub?: string | null) => {
-        console.log('useImageList addStar userSub: ', userSub);
-
-        if (!userSub) return;
-
-        const res = await actionAddImageStar(currentImgId, userSub);
+        const res = await actionAddImageStar(currentImgId);
 
         if (res) {
             console.log(`userSub: ${userSub}가 이미지에 좋아요를 추가했습니다.`)
-            setStarList(list => [...list, res])
+            setStarList(list => [...list, res.userInfo])
         }
     }
     const removeStar = async (userSub?: string | null) => {
-        console.log('useImageList removeStar userSub: ', userSub);
-
-        if (!userSub) return;
-
-        const res = await actionRemoveImageStar(currentImgId, userSub);
+        const res = await actionRemoveImageStar(currentImgId);
 
         if (res) {
             console.log(`userSub: ${userSub}가 이미지에 좋아요를 취소했습니다.`)
-            setStarList(list => list.filter(l => l.sub !== res.sub))
+            setStarList(list => list.filter(l => l.sub !== res.userInfo.sub))
         }
     }
 

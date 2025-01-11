@@ -15,6 +15,7 @@ import {
     getSurroundingImagesById,
     getUserImages,
     getUserImagesByDate,
+    hasUserLikedImage,
     removeImageComment,
     removeImageStar,
     removeImageTag,
@@ -139,16 +140,32 @@ export async function actionRemoveImageComment(imageId: string, commentId: strin
     return res.acknowledged && res.modifiedCount > 0;
 }
 
+export async function actionHasUserLikedImage(imageId: string) {
+    const viewerId = await actionGetUserIdBySub();
+
+    if (!viewerId) {
+        return;
+    }
+    return await hasUserLikedImage(imageId, viewerId);
+}
 export async function actionGetImageStarList(imageId: string) {
     return await getImageStarList(imageId);
 }
 
-export async function actionAddImageStar(imageId: string, userSub: string) {
-    return await addImageStar(imageId, userSub)
+export async function actionAddImageStar(imageId: string) {
+    const viewerId = await actionGetUserIdBySub();
+    if (!viewerId) {
+        return;
+    }
+    return await addImageStar(imageId, viewerId)
 }
 
-export async function actionRemoveImageStar(imageId: string, userSub: string) {
-    return await removeImageStar(imageId, userSub)
+export async function actionRemoveImageStar(imageId: string) {
+    const viewerId = await actionGetUserIdBySub();
+    if (!viewerId) {
+        return;
+    }
+    return await removeImageStar(imageId, viewerId)
 }
 
 export async function actionUpdateImageTitleAndDescription(imageId: string, new_title: string, new_description: string) {

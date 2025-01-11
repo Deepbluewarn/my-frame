@@ -34,37 +34,37 @@
 .overlay {
     position: absolute;
     width: 100%;
-    height: 100%;
     border-image: linear-gradient(hsla(0, 0%, 0%, 0.11), hsla(0, 0%, 0%, 0.41)) fill 1;
     z-index: 1;
     color: white;
     opacity: 0;
-    visibility: hidden;
+    pointer-events: none;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.overlay.visible {
-    opacity: 1;
-    visibility: visible;
+.overlay_top {
+    top: 0;
 }
 
-.overlay_foot {
-    position: absolute;
+.overlay_bottom {
     bottom: 0;
-    width: 100%;
-    padding: 16px;
-    justify-content: space-between;
 }
 
-.overlay_foot_left {
-    flex: 0.9;
-    overflow: auto;
+.image_wrapper:hover {
+    .overlay {
+        opacity: 1;
+        pointer-events: auto;
+    }
 }
+
 .overlay_title {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
+
 .star {
-    align-self: flex-end;
+    flex-shrink: 0;
+    width: 1.2rem;
+    margin-left: auto;
 }

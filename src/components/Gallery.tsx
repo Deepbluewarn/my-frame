@@ -11,6 +11,7 @@ export interface IGallery {
     title: string;
     width: number;
     height: number;
+    likes?: string[];
     ownerDetails: UserInterface;
 }
 
