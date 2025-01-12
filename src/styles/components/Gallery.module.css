@@ -34,7 +34,6 @@
 .overlay {
     position: absolute;
     width: 100%;
-    border-image: linear-gradient(hsla(0, 0%, 0%, 0.11), hsla(0, 0%, 0%, 0.41)) fill 1;
     z-index: 1;
     color: white;
     opacity: 0;
@@ -43,10 +42,12 @@
 }
 
 .overlay_top {
+    border-image: linear-gradient(hsla(0, 0%, 0%, 0.74), hsla(0, 0%, 79.2%, 0)) fill 1;
     top: 0;
 }
 
 .overlay_bottom {
+    border-image: linear-gradient(hsla(0, 0%, 79.2%, 0), hsla(0, 0%, 0%, 0.74)) fill 1;
     bottom: 0;
 }
 
