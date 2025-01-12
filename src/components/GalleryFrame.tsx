@@ -29,15 +29,20 @@ export default function GalleryFrame({
   const onStarClicked = useCallback(async () => {
     let res;
 
-    if (typeof star !== 'undefined' && star) {
-      res = await actionRemoveImageStar(gallery._id);
-    } else {
-      res = await actionAddImageStar(gallery._id);
+    try {
+      if (typeof star !== 'undefined' && star) {
+        res = await actionRemoveImageStar(gallery._id);
+      } else {
+        res = await actionAddImageStar(gallery._id);
+      }
+
+      if (res) {
+        setStar(res.star);
+      }
+    } catch (e) {
+      alert((e as Error).message);
     }
 
-    if (res) {
-      setStar(res.star);
-    }
   }, [star])
 
   const image = (

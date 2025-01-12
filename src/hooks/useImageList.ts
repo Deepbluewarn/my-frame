@@ -139,43 +139,56 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     const addTags = async (tagStr: string) => {
         const tags = tagStr.split(' ');
 
-        actionAddImageTags(currentImgId, tags).then(() => {
-            setImageCache(m => {
-                const res = new Map(m);
-                const image = res.get(currentImgId);
-    
-                if (image) {
-                    image.tags = Array.from(new Set([...image.tags, ...tags]))
-                    res.set(currentImgId, image);
-                }
-    
-                return res;
+        try {
+            await actionAddImageTags(currentImgId, tags).then(() => {
+                setImageCache(m => {
+                    const res = new Map(m);
+                    const image = res.get(currentImgId);
+        
+                    if (image) {
+                        image.tags = Array.from(new Set([...image.tags, ...tags]))
+                        res.set(currentImgId, image);
+                    }
+        
+                    return res;
+                })
             })
-        })
+        } catch(e) {
+            alert((e as Error).message)
+        }
     }
 
-    const removeTags = (targetTag: string) => {
-        actionRemoveImageTag(currentImgId, targetTag).then(() => {
-            setImageCache(m => {
-                const res = new Map(m);
-                const image = res.get(currentImgId);
-    
-                if (image) {
-                    image.tags = image.tags.filter(v => v !== targetTag)
-                }
-    
-                return res;
+    const removeTags = async (targetTag: string) => {
+        try {
+            await actionRemoveImageTag(currentImgId, targetTag).then(() => {
+                setImageCache(m => {
+                    const res = new Map(m);
+                    const image = res.get(currentImgId);
+        
+                    if (image) {
+                        image.tags = image.tags.filter(v => v !== targetTag)
+                    }
+        
+                    return res;
+                })
             })
-        })
+        } catch(e) {
+            alert((e as Error).message)
+        }
+        
     }
 
-    const addComment = (comment: string) => {
-        actionAddImageComment(currentImgId, comment).then((addedComment) => {
-            console.log('useImageList addComment addedComment: ', addedComment)
-            setComment(comments => {
-                return [...comments, addedComment]
+    const addComment = async (comment: string) => {
+        try {
+            await actionAddImageComment(currentImgId, comment).then((addedComment) => {
+                console.log('useImageList addComment addedComment: ', addedComment)
+                setComment(comments => {
+                    return [...comments, addedComment]
+                })
             })
-        })
+        } catch (e) {
+            alert((e as Error).message)
+        }
     }
 
     const removeComment = async (commentId: string) => {
@@ -189,19 +202,25 @@ export default function useImageList(initImages: ImageWithOwner[]) {
     }
 
     const addStar = async (userSub?: string | null) => {
-        const res = await actionAddImageStar(currentImgId);
+        try {
+            const res = await actionAddImageStar(currentImgId);
 
-        if (res) {
-            console.log(`userSub: ${userSub}가 이미지에 좋아요를 추가했습니다.`)
-            setStarList(list => [...list, res.userInfo])
+            if (res) {
+                setStarList(list => [...list, res.userInfo])
+            }
+        } catch (e) {
+            alert((e as Error).message);
         }
     }
     const removeStar = async (userSub?: string | null) => {
-        const res = await actionRemoveImageStar(currentImgId);
+        try {
+            const res = await actionRemoveImageStar(currentImgId);
 
-        if (res) {
-            console.log(`userSub: ${userSub}가 이미지에 좋아요를 취소했습니다.`)
-            setStarList(list => list.filter(l => l.sub !== res.userInfo.sub))
+            if (res) {
+                setStarList(list => list.filter(l => l.sub !== res.userInfo.sub))
+            }
+        } catch (e) {
+            alert((e as Error).message);
         }
     }
 
@@ -209,7 +228,8 @@ export default function useImageList(initImages: ImageWithOwner[]) {
         const update = await actionUpdateImageTitleAndDescription(currentImgId, new_title, new_description)
 
         if (!update) {
-            throw new Error('사진 정보 업데이트에 실패했습니다.')
+            alert('사진 정보 업데이트에 실패했습니다.')
+            return;
         }
 
         setImageCache(c => {
