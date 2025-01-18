@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Flex } from "@mantine/core"
+import { AspectRatio, Button, Flex, Grid, Skeleton, Text } from "@mantine/core"
 import GalleryComponent from "./Gallery"
 import { useEffect, useRef, useState } from "react";
 import { ImagePaginationParams } from "@/actions/image";
@@ -55,7 +55,24 @@ export default function GalleryList<T extends ImagePaginationParams, R extends I
 
     return (
         <Flex direction={'column'} justify={'center'} gap={8}>
-            <GalleryComponent images={images} />
+            {
+                images.length > 0 ? (
+                    <GalleryComponent images={images} />
+                ) : (
+                    <Grid grow>
+                        {
+                            Array(8).fill(0).map((_, idx) => (
+                                <Grid.Col key={idx} span={3}>
+                                    <AspectRatio ratio={600 / 400} mx="auto">
+                                        <Skeleton />
+                                    </AspectRatio>
+                                </Grid.Col>
+                            ))
+                        }
+                    </Grid>
+                )
+            }
+
             <Button onClick={loadMore} disabled={loading}>
                 더 보기
             </Button>
