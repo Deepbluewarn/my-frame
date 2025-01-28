@@ -3,19 +3,14 @@
 import { Button, Flex, Text, TextInput } from "@mantine/core"
 import { useEffect, useRef, useState } from "react";
 import Styles from '@/styles/components/imageDetails.module.css';
+import { useImageDetailStore } from "@/providers/image-detail-store-provider";
 
-export default function ImageSummary(
-    {
-        username, title, description, 
-        updateImageTitleAndDescription,
-    } : 
-    {
-        username: string, title: string, description: string,
-        updateImageTitleAndDescription: (new_title: string, new_description: string) => Promise<void>, 
-    }
-) {
-    const [_title, set_Title] = useState<string>(title)
-    const [_description, set_Description] = useState<string>(description)
+export default function ImageSummary() {
+    const ImageStore = useImageDetailStore(store => store);
+    const currentImage = ImageStore.currentImage;
+    const ImageStoreActions = ImageStore.actions;
+    const [title, setTitle] = useState<string>('')
+    const [description, setDescription] = useState<string>('')
     const [editing, setEditing] = useState(false);
     const summaryRef = useRef<HTMLDivElement>(null);
 
@@ -26,19 +21,28 @@ export default function ImageSummary(
     };
 
     const requestUpdate = async () => {
+        if (!currentImage) {
+            return;
+        }
+        
         try {
-            await updateImageTitleAndDescription(_title, _description)
+            if (title !== currentImage.title) {
+                await ImageStoreActions.title.update(title);
+            }
+            if (description !== currentImage.description) {
+                await ImageStoreActions.description.update(description);
+            }
         } catch(e) {
             alert((e as Error).message);
         } finally {
-            setEditing(false);
+            setEditing(false)
         }
     }
 
     useEffect(() => {
-        set_Title(title);
-        set_Description(description)
-    }, [title, description])
+        setTitle(currentImage?.title || '');
+        setDescription(currentImage?.description || '')
+    }, [currentImage?.title, currentImage?.description])
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -46,6 +50,10 @@ export default function ImageSummary(
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+    
+    if (!ImageStore.currentImage) {
+        return null;
+    }
     
     return (
         <Flex 
@@ -61,20 +69,20 @@ export default function ImageSummary(
                         <>
                             <TextInput
                                 placeholder="제목 입력"
-                                value={_title}
-                                onChange={e => set_Title(e.target.value)}
+                                value={title}
+                                onChange={e => setTitle(e.target.value)}
                             />
                             <TextInput
                                 placeholder="상세 정보 입력"
-                                value={_description}
-                                onChange={e => set_Description(e.target.value)}
+                                value={description}
+                                onChange={e => setDescription(e.target.value)}
                             />
                             <Button className={Styles.edit_done_btn} onClick={requestUpdate}>완료</Button>
                         </>
                     ) : (
                         <>
-                            <Text fw={500}>{title}</Text>
-                            <Text>{description}</Text>
+                            <Text fw={500}>{ImageStore.currentImage.title}</Text>
+                            <Text>{ImageStore.currentImage.description}</Text>
                         </>
                     )
                 }

@@ -7,7 +7,7 @@ import { IconStar, IconStarFilled } from '@tabler/icons-react';
 import Link from 'next/link';
 import { resizeWithRatio } from '@/utils/common';
 import { actionAddImageStar, actionRemoveImageStar } from '@/actions/image';
-import { useUserIdStore } from '@/providers/userid-store-provider';
+import { useUserInfoStore } from '@/providers/userid-store-provider';
 
 export default function GalleryFrame({
   gallery, imageStyle,
@@ -18,7 +18,7 @@ export default function GalleryFrame({
   className?: string, overlay: boolean, link: boolean,
   resize?: boolean,
 }) {
-  const _id = useUserIdStore(store => store._id);
+  const _id = useUserInfoStore(store => store._id);
   const resized = resizeWithRatio(gallery.width, gallery.height);
   const [star, setStar] = useState<boolean>(false);
 

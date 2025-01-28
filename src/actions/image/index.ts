@@ -20,8 +20,9 @@ import {
     removeImageStar,
     removeImageTag,
     searchImages,
+    updateImageDescription,
     updateImagesMetadata,
-    updateImageTitleAndDescription, 
+    updateImageTitle,
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
 import { IComment, Visibility } from "@/db/models/Image";
@@ -168,8 +169,12 @@ export async function actionRemoveImageStar(imageId: string) {
     return await removeImageStar(imageId, viewerId)
 }
 
-export async function actionUpdateImageTitleAndDescription(imageId: string, new_title: string, new_description: string) {
-    return await updateImageTitleAndDescription(imageId, new_title, new_description);
+export async function actionUpdateImageTitle(imageId: string, new_title: string) {
+    return await updateImageTitle(imageId, new_title);
+}
+
+export async function actionUpdateImageDescription(imageId: string, new_description: string) {
+    return await updateImageDescription(imageId, new_description);
 }
 
 export async function actionGetFollowerListWithImages(page: number = 1) {

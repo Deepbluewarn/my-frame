@@ -451,21 +451,34 @@ export async function removeImageStar(imageId: string, viewerId: string): Promis
     }
 }
 
-export async function updateImageTitleAndDescription(imageId: string, new_title: string, new_description: string) {
-    const imageInfo = {
-        title: new_title,
-        description: new_description
-    }
-
+export async function updateImageTitle(imageId: string, new_title: string) {
+    const newInfo = { title: new_title }
     const res = await Image.updateOne(
         { _id: imageId },
         {
-            $set: imageInfo
+            $set: newInfo
         }
     )
 
     if (res.acknowledged && res.modifiedCount > 0) {
-        return imageInfo
+        return newInfo
+    } else {
+        return null;
+    }
+}
+
+
+export async function updateImageDescription(imageId: string, new_description: string) {
+    const newInfo = { description: new_description }
+    const res = await Image.updateOne(
+        { _id: imageId },
+        {
+            $set: newInfo
+        }
+    )
+
+    if (res.acknowledged && res.modifiedCount > 0) {
+        return newInfo
     } else {
         return null;
     }

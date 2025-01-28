@@ -1,24 +1,28 @@
 import Styles from '@/styles/components/imageDetails.module.css';
 import { Box } from "@mantine/core";
-import { actionGetImageById, actionGetSurroundingImagesById } from "@/actions/image";
-import ImageDetails from "@/components/ImageDetails";
+import { actionGetSurroundingImagesById } from "@/actions/image";
+import ImageDetails from "@/components/ImageDetail/ImageDetail";
 import { notFound } from 'next/navigation';
 import { isValidObjectId } from 'mongoose';
-// https://github.com/vercel/next.js/discussions/18072
-// https://medium.com/@moh.mir36/shallow-routing-with-next-js-v13-app-directory-2d765928c340
+import { ImageDetailStoreProvider } from '@/providers/image-detail-store-provider';
+
 export default async function Page({ params }: { params: { imageId: string } }) {
+    let THUMBNAIL_LIST_RADIUS: number = parseInt(process.env.NEXT_PUBLIC_THUMBNAIL_LIST_RADIUS || '3', 10);
+
     // objectId 유효성 확인
     if (!isValidObjectId(params.imageId)) {
         notFound()
     }
-    
-    const images = await actionGetSurroundingImagesById(params.imageId, 2);
+
+    const images = await actionGetSurroundingImagesById(params.imageId, THUMBNAIL_LIST_RADIUS + 1);
 
     if (!images || images.length === 0) notFound();
 
     return (
-        <Box className={Styles.container}>
-            <ImageDetails images={images}/>
-        </Box>
+        <ImageDetailStoreProvider value={{ imageId: params.imageId, images }} >
+            <Box className={Styles.container}>
+                <ImageDetails />
+            </Box>
+        </ImageDetailStoreProvider>
     )
 }
