@@ -4,7 +4,7 @@ import { actionGetFollowerListWithImages } from '@/actions/image';
 import { Avatar, Button, Group, Stack, Text } from '@mantine/core';
 import GalleryComponent, { IGallery } from '@/components/Gallery';
 import { IFollowerListWithImage } from '@/services/Image';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import Styles from '@/styles/home.module.css'
 
 export default function ExploreFollowerImages() {
@@ -44,13 +44,13 @@ export default function ExploreFollowerImages() {
       return null;
     }
     return (
-      <>
+      <Fragment key={fList.ownerDetails._id}>
         <Group>
           <Avatar src={fList.ownerDetails.profilePicture} alt={fList.ownerDetails.username} />
           <Text>{fList.ownerDetails.username}</Text>
         </Group>
         <GalleryComponent images={gallaryImages} />
-      </>
+      </Fragment>
     )
   })
 
