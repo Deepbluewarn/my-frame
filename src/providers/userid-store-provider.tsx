@@ -1,38 +1,38 @@
 'use client'
 
-import { UserIdState, UserIdStore, createUserIdStore } from "@/stores/userid-store"
+import { UserInfoState, UserInfoStore, createUserInfoStore } from "@/stores/userid-store"
 import { createContext, ReactNode, useContext, useRef } from "react";
 import { useStore } from "zustand";
 
-export type UserIdStoreApi = ReturnType<typeof createUserIdStore>;
-export const UserIdStoreContext =
-    createContext<UserIdStoreApi | undefined>(undefined)
-export interface UserIdStoreProviderProps {
-    children: ReactNode, value: UserIdState
+export type UserInfoStoreApi = ReturnType<typeof createUserInfoStore>;
+export const UserInfoStoreContext =
+    createContext<UserInfoStoreApi | undefined>(undefined)
+export interface UserInfoStoreProviderProps {
+    children: ReactNode, value: UserInfoState
 }
-export const UserIdStoreProvider = (
-    { children, value } : UserIdStoreProviderProps
+export const UserInfoStoreProvider = (
+    { children, value } : UserInfoStoreProviderProps
 ) => {
-    const storeRef = useRef<UserIdStoreApi>()
+    const storeRef = useRef<UserInfoStoreApi>()
     if (!storeRef.current) {
-        storeRef.current = createUserIdStore(value._id)
+        storeRef.current = createUserInfoStore(value)
     }
 
     return (
-        <UserIdStoreContext.Provider value={storeRef.current}>
+        <UserInfoStoreContext.Provider value={storeRef.current}>
             {children}
-        </UserIdStoreContext.Provider>
+        </UserInfoStoreContext.Provider>
     )
 }
 
-export const useUserIdStore = <T,>(
-    selector: (store: UserIdStore) => T,
+export const useUserInfoStore = <T,>(
+    selector: (store: UserInfoStore) => T,
 ): T => {
-    const userIdStoreContext = useContext(UserIdStoreContext)
+    const userInfoStoreContext = useContext(UserInfoStoreContext)
 
-    if (!userIdStoreContext) {
-        throw new Error(`useUserIdStore must be used within UserIdStoreProvider`)
+    if (!userInfoStoreContext) {
+        throw new Error(`useUserInfoStore must be used within UserInfoStoreProvider`)
     }
 
-    return useStore(userIdStoreContext, selector)
+    return useStore(userInfoStoreContext, selector)
 }

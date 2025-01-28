@@ -1,20 +1,24 @@
 import { createStore } from "zustand";
 
-export type UserIdState = {
+export type UserInfoState = {
     _id: string
+    sub: string
 }
 
-export type UserIdActions = {
+export type UserInfoActions = {
     setId: (_id: string) => void
+    setSub: (sub: string) => void
 }
 
-export type UserIdStore = UserIdState & UserIdActions;
+export type UserInfoStore = UserInfoState & UserInfoActions;
 
-export function createUserIdStore(initState: string) {
-    return createStore<UserIdStore>(set => {
+export function createUserInfoStore(initState: UserInfoState) {
+    return createStore<UserInfoStore>(set => {
         return {
-            _id: initState,
-            setId: (_id) => set((state) => ({ _id }))
+            _id: initState._id,
+            sub: initState.sub,
+            setId: (_id) => set({ _id }),
+            setSub: (sub) => set({ sub })
         }
     })
 }

@@ -8,7 +8,7 @@ import Header from '@/components/Header/Header';
 import HomeStyles from '@/styles/home.module.css'
 import { IconMail, IconBrandGithub } from '@tabler/icons-react';
 import { getSession } from '@auth0/nextjs-auth0';
-import { UserIdStoreProvider } from '@/providers/userid-store-provider';
+import { UserInfoStoreProvider } from '@/providers/userid-store-provider';
 import { actionGetUserIdBySub } from '@/actions/user';
 
 export const metadata: Metadata = {
@@ -23,14 +23,14 @@ export default async function RootLayout({
 }>) {
   const session = await getSession();
   const user = session?.user;
-  const userId = await actionGetUserIdBySub();
+  const userId = await actionGetUserIdBySub(user?.sub);
 
   return (
     <html lang="ko">
       <head>
         <ColorSchemeScript />
       </head>
-      <UserIdStoreProvider value={{ _id: userId || '' }}>
+      <UserInfoStoreProvider value={{ _id: userId || '', sub: user?.sub}}>
         <UserProvider>
           <body>
             <MantineProvider>
@@ -53,7 +53,7 @@ export default async function RootLayout({
             </MantineProvider>
           </body>
         </UserProvider>
-      </UserIdStoreProvider>
+      </UserInfoStoreProvider>
     </html>
   );
 }
