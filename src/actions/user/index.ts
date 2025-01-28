@@ -3,11 +3,17 @@
 import { followUser, getUserBySub, getUserWithFollowInfo, searchUsers, unFollowUser } from "@/services/User";
 import { getSession } from "@auth0/nextjs-auth0";
 
-export async function actionGetUserIdBySub() {
-    const session = await getSession();
-    const user = session?.user;
+export async function actionGetUserIdBySub(sub?: string) {
+    let session = await getSession();
+    let user = session?.user;
 
-    const viewer = await actionGetUserBySub(user?.sub)
+    if (typeof sub === 'undefined') {
+        session = await getSession();
+        user = session?.user;
+        sub = user?.sub;
+    }
+
+    const viewer = await actionGetUserBySub(sub!)
 
     return viewer?._id;
 }
