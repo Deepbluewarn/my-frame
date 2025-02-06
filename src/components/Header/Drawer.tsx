@@ -10,7 +10,9 @@ export default function HeaderDrawer({ children }: { children: React.ReactNode }
     const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
 
     useEffect(() => {
-        closeDrawer();
+        if (drawerOpened) {
+            closeDrawer();
+        }
     }, [pathname])
 
     return (
@@ -22,6 +24,5 @@ export default function HeaderDrawer({ children }: { children: React.ReactNode }
                 </ScrollArea>
             </Drawer>
         </>
-
     )
 }
