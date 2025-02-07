@@ -22,7 +22,7 @@ export default function useFetchWithAbortController<T>(
             try {
                 setResponse(await fetchWithType<T>(url, options));
             } catch(e) {
-                console.log(e)
+                
             } finally {
                 setLoading(false);
             }

@@ -155,7 +155,6 @@ export function createImageDetailStore(initData: InitImageDetail) {
                 common: {
                     setId: async (newId) => {
                         set({ currentImageId: newId })
-                        updateHistory(`/image/${newId}`);
 
                         const { images, currentImageId } = get();
                         const ids = images.map(img => img._id);
@@ -180,6 +179,7 @@ export function createImageDetailStore(initData: InitImageDetail) {
 
                     if (newId) {
                         get().actions.common.setId(newId);
+                        updateHistory(`/image/${newId}`);
                     }
                 },
                 comment: {

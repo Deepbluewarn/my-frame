@@ -2,6 +2,7 @@ import { Flex } from "@mantine/core";
 import { ImageWithOwner } from "@/services/Image";
 import ImageThumbnail from "../ImageThumbnail";
 import { useImageDetailStore } from "@/providers/image-detail-store-provider";
+import { updateHistory } from "@/utils/common";
 
 export default function ImageThumbnailList({
     list, currentImageId
@@ -18,6 +19,7 @@ export default function ImageThumbnailList({
             onThumbnailClick={(image) => {
                 if (image?._id) {
                     setCurrentImageId(image?._id);
+                    updateHistory(`/image/${image?._id}`);
                 }
             }}
         />
