@@ -22,10 +22,11 @@ const s3 = new S3({
 async function uploadImageToS3(file: File) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
+    const today = new Date().getTime();
 
     const params = {
         Bucket: process.env.S3_BUCKET_NAME!,
-        Key: `${file.name}`,
+        Key: `${file.name}_${today}`,
         Body: buffer,
         ContentType: file.type
     };
