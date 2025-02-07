@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     let res: IUserInfo[] = [];
 
     if (!imageId) {
-        return res
+        return Response.json(res);
     }
 
     res = await getImageStarList(imageId);
