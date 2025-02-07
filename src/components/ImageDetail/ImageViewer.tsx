@@ -9,7 +9,7 @@ import { IGallery } from "../Gallery";
 export default function ImageViewer() {
     const thumbnails = useImageDetailStore(store => store.thumbnails);
     const currentImage = useImageDetailStore(store => store.currentImage);
-    const ImageStoreActions = useImageDetailStore(store => store.actions);
+    const navigate = useImageDetailStore(store => store.actions.navigate);
 
     if (!currentImage) {
         return <Text>이미지를 찾을 수 없습니다.</Text>
@@ -27,7 +27,7 @@ export default function ImageViewer() {
         <Box className={Styles.image_container}>
             <ActionIcon
                 variant="default"
-                onClick={() => { ImageStoreActions.navigate('prev') }}
+                onClick={() => { navigate('prev') }}
                 className={`${Styles.nav_prev_btn} ${Styles.nav_btn}`}
             >
                 <IconCircleChevronLeft />
@@ -43,7 +43,7 @@ export default function ImageViewer() {
             />
             <ActionIcon
                 variant="default"
-                onClick={() => { ImageStoreActions.navigate('next') }}
+                onClick={() => { navigate('next') }}
                 className={`${Styles.nav_next_btn} ${Styles.nav_btn}`}
             >
                 <IconCircleChevronRight />

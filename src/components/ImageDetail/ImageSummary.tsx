@@ -6,9 +6,8 @@ import Styles from '@/styles/components/imageDetails.module.css';
 import { useImageDetailStore } from "@/providers/image-detail-store-provider";
 
 export default function ImageSummary() {
-    const ImageStore = useImageDetailStore(store => store);
-    const currentImage = ImageStore.currentImage;
-    const ImageStoreActions = ImageStore.actions;
+    const currentImage = useImageDetailStore(store => store.currentImage);
+    const ImageStoreActions = useImageDetailStore(store => store.actions);
     const [title, setTitle] = useState<string>('')
     const [description, setDescription] = useState<string>('')
     const [editing, setEditing] = useState(false);
@@ -51,7 +50,7 @@ export default function ImageSummary() {
         };
     }, []);
     
-    if (!ImageStore.currentImage) {
+    if (!currentImage) {
         return null;
     }
     
@@ -81,8 +80,8 @@ export default function ImageSummary() {
                         </>
                     ) : (
                         <>
-                            <Text fw={500}>{ImageStore.currentImage.title}</Text>
-                            <Text>{ImageStore.currentImage.description}</Text>
+                            <Text fw={500}>{currentImage.title}</Text>
+                            <Text>{currentImage.description}</Text>
                         </>
                     )
                 }

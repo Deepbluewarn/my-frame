@@ -337,7 +337,7 @@ export async function getImageComments(imageId: string) {
     ])
 
     if (!image || image.length <= 0) {
-        return null;
+        return [];
     }
 
     return (image[0].comments as IComment[]).map(c => {
@@ -391,10 +391,7 @@ export async function getImageStarList(imageId: string): Promise<IUserInfo[]> {
             }
         }
     ])
-
-    console.log('Image Service getImageStarList likeUserList: ', JSON.stringify(res[0].likeUserList))
-
-    return res[0].likeUserList;
+    return res[0]?.likeUserList;
 }
 
 // 좋아요를 추가 또는 취소한 유저의 IUserInfo 객체를 반환.

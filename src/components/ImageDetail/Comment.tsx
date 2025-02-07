@@ -7,6 +7,7 @@ import { useUserInfoStore } from "@/providers/userid-store-provider";
 import { Avatar, Button, Flex, Text } from "@mantine/core";
 
 export default function Comment({ comment }: { comment: IComment }) {
+    const currentImage = useImageDetailStore(store => store.currentImage);
     const userSub = useUserInfoStore(store => store.sub);
     const commentsActions = useImageDetailStore(store => store.actions.comment);
 
@@ -22,7 +23,7 @@ export default function Comment({ comment }: { comment: IComment }) {
             <Flex direction='column' gap={4}>
                 <Flex>
                     {
-                        userSub === (comment.commenter as IUserInfo).sub ? (
+                        userSub === currentImage?.ownerDetails.sub ? (
                             <Text>👑</Text>
                         ) : (
                             null

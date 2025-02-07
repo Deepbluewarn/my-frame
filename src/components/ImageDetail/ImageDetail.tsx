@@ -5,33 +5,32 @@ import Styles from '@/styles/components/imageDetails.module.css';
 import {
     Box, Divider, Flex,
 } from "@mantine/core";
-import StarList from "./ImageLikeList";
+import LikeList from "./ImageLikeList";
 import { useImageDetailStore } from "@/providers/image-detail-store-provider";
 import ImageViewer from "./ImageViewer";
 import ImageInfo from "./ImageInfo";
 import ImageTags from "./ImageTags";
 import ImageComments from "./ImageComments";
 import ImageAttributes from './ImageAttributes';
-import { usePathname } from 'next/navigation';
 
 export default function ImageDetails() {
-    const ImageStore = useImageDetailStore(store => store);
-    const pathname = usePathname();
+    const setCurrentImageId = useImageDetailStore(store => store.actions.common.setId);
 
     useEffect(() => {
-        const path = decodeURI(pathname);
-        const id = path.split('/')[2];
-        ImageStore.actions.common.setId(id);
-    }, [pathname])
+        const handlePopState = () => {
+            const id = window.location.pathname.split('/').pop();
+            if (id) {
+                setCurrentImageId(id);
+            }
+        };
 
-    useEffect(() => {
-        ImageStore.actions.common.init();
-    }, [])
+        window.addEventListener('popstate', handlePopState);
 
-    if (!ImageStore.currentImage) {
-        return null;
-    }
-
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, []);
+    
     return (
         <Box className={Styles.container}>
             <ImageViewer />
@@ -41,7 +40,7 @@ export default function ImageDetails() {
                     <Divider className={Styles.list_divider} />
                     <ImageTags />
                     <Divider className={Styles.list_divider} />
-                    <StarList />
+                    <LikeList />
                     <Divider className={Styles.list_divider} />
                     <ImageComments />
                 </Flex>

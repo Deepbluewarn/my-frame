@@ -16,10 +16,23 @@ export function listFormat(list: string[], head_length: number = 4) {
 
 export function resizeWithRatio(w: number, h: number, maxWidth: number = 500) {
     if (w <= maxWidth) {
-      return [w, h];
+        return [w, h];
     } else {
-      const r = w / maxWidth
-      return [w / r, h / r]
+        const r = w / maxWidth
+        return [w / r, h / r]
     }
-  }
-  
+}
+
+export async function fetchWithType<T>(url: string, options?: RequestInit): Promise<T> {
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    return await response.json() as T;
+}
+
+export function updateHistory(url: string) {
+    window.history.pushState(null, '', url);
+}
