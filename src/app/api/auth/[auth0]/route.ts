@@ -8,6 +8,9 @@ export const GET = handleAuth({
         }
     }),
     signup: handleLogin({
-        authorizationParams: { screen_hint: 'signup' }
+        authorizationParams: { 
+            screen_hint: 'signup', 
+            baseURL: process.env.AUTH0_BASE_URL, 
+        }
     })
 });
