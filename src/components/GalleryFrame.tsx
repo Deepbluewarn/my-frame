@@ -53,8 +53,6 @@ export default function GalleryFrame({
       height={resize ? resized[1] : gallery.height}
       style={imageStyle}
       className={className}
-      placeholder='blur'
-      blurDataURL="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVR42mN8//HLfwYiAOOoQvoqBAB  bWyZJf74GZgAAAABJRU5ErkJggg=="
     />
   )
 
