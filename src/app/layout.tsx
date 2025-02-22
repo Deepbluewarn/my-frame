@@ -10,9 +10,10 @@ import { IconMail, IconBrandGithub } from '@tabler/icons-react';
 import { getSession } from '@auth0/nextjs-auth0';
 import { UserInfoStoreProvider } from '@/providers/userid-store-provider';
 import { actionGetUserIdBySub } from '@/actions/user';
+import NextTopLoader from 'nextjs-toploader';
 
 export const metadata: Metadata = {
-  title: "My Frame",
+  title: `${process.env.NODE_ENV === 'development' ? '[DEV]' : ''} My Frame`,
   description: "사진을 등록하고 슬라이드를 볼 수 있는 서비스입니다.",
 };
 
@@ -33,9 +34,10 @@ export default async function RootLayout({
       <UserInfoStoreProvider value={{ _id: userId || '', sub: user?.sub}}>
         <UserProvider>
           <body>
+            <NextTopLoader />
             <MantineProvider>
               <Header fixed={true} />
-              <main className={`${HomeStyles.container} ${!user ? HomeStyles.background : ''}`}>
+              <main className={`${HomeStyles.container}`}>
                 {children}
               </main>
               <footer className={HomeStyles.footer}>

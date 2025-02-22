@@ -37,7 +37,7 @@ export default function UserSearchList({ query } : { query: string }) {
                 <Flex direction={'column'} gap={16}>
                     {
                         users.results.map(u => {
-                            return <ProfileAvatar key={u._id} userInfo={u} />
+                            return <ProfileAvatar key={u._id} userId={u._id} />
                         })
                     }
                 </Flex>

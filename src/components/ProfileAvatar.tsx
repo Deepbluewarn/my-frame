@@ -5,14 +5,31 @@ import {
 } from "@mantine/core";
 import FollowButton from "./FollowButton";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IUserWithFollowInfo } from "@/services/User";
+import { useUserInfoStore } from "@/providers/userid-store-provider";
+import { actionGetUserWithFollowInfo } from "@/actions/user";
 
-export default function ProfileAvatar({ userInfo } : { userInfo: IUserWithFollowInfo }) {
+// userInfo: 표시하고자 하는 회원 객체
+export default function ProfileAvatar({ userId } : { userId?: string }) {
+    // currentUser: 현재 접속한 회원의 객체
     const { user: currentUser, error, isLoading } = useUser();
-    const [userFollowInfo, setUserFollowInfo] = useState<IUserWithFollowInfo>(userInfo);
+    const currentUserId = useUserInfoStore(store => store._id);
+    const [userInfo, setUserInfo] = useState<IUserWithFollowInfo | undefined>();
 
-    if (!userFollowInfo) {
+    useEffect(() => {
+        const asyncFn = async () => {
+            let uid = userId;
+
+            if (typeof userId === 'undefined') {
+                uid = currentUserId;
+            }
+            setUserInfo((await actionGetUserWithFollowInfo(uid!))[0]);
+        }
+        asyncFn();
+    }, [])
+
+    if (!userInfo) {
         return null;
     }
     if (!currentUser || !currentUser.sub) {
@@ -29,7 +46,7 @@ export default function ProfileAvatar({ userInfo } : { userInfo: IUserWithFollow
                         wordBreak: 'break-word',
                     }}>{userInfo.username}</Text>
                     {
-                        currentUser?.sub === userInfo.sub ? (
+                        currentUser?.sub === userInfo?.sub ? (
                             null
                         ) : (
                             <FollowButton userId={userInfo._id} currentUserSub={currentUser.sub} />
