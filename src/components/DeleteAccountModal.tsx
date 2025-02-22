@@ -1,6 +1,5 @@
 'use client'
 
-import { _actionDeleteImages, _actionDeleteS3Images, _actionGetuserImages } from "@/actions/image";
 import { actionUserSelfDelete } from "@/actions/user";
 import { useUserInfoStore } from "@/providers/userid-store-provider";
 import { Button, Flex, Modal, Text } from "@mantine/core"
