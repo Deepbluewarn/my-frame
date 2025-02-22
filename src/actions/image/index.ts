@@ -5,6 +5,7 @@ import {
     addImageStar,
     addImageTags,
     deleteImages,
+    deleteS3Images,
     getFollowerListWithImages,
     getImageById, 
     getImageComments, 
@@ -25,8 +26,9 @@ import {
     updateImageTitle,
 } from "@/services/Image";
 import { actionGetUserIdBySub } from "../user";
-import { IComment, Visibility } from "@/db/models/Image";
+import Image, { IComment, Visibility } from "@/db/models/Image";
 import { getSession } from "@auth0/nextjs-auth0";
+import { S3 } from "@aws-sdk/client-s3";
 
 export interface ImagePaginationParams {
     limit?: number;
@@ -45,7 +47,7 @@ export async function actionGetImageById(_id: string) {
 
 export async function actionGetUserImages(params: UserImagePaginationParams) {
     const viewerId = await actionGetUserIdBySub();
-    return await getUserImages(params.limit, params.user_id, viewerId, params.last_image_id);
+    return await getUserImages(params.user_id, params.limit, viewerId, params.last_image_id);
 }
 
 export async function actionGetUserImagesByDate(params: UserImagePaginationParams) {
@@ -195,4 +197,26 @@ export async function actionSearchImages(query: string, page: number = 1, pageSi
 
 export async function actionDeleteImages(imageIds: string[]) {
     return await deleteImages(imageIds);
+}
+
+export async function actionDeleteAllUserImages(userId: string) {
+    const session = await getSession();
+    const user = session?.user;
+    const result = {
+        images_deleted: false,
+        s3_deleted: false,
+    }
+
+    if (!user) {
+        return result;
+    }
+
+    const images = await getUserImages(userId);
+    const imageIds = images.map(img => img._id);
+    const s3Keys = images.map(img => img.s3_key);
+
+    result.images_deleted = await deleteImages(imageIds);
+    result.s3_deleted = await deleteS3Images(s3Keys);
+
+    return result;
 }

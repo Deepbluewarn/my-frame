@@ -22,7 +22,7 @@ export default async function Header({ fixed = true }: { fixed?: boolean }) {
                     <Link href={'/'}><Text fw={700} size="lg">MY FRAME</Text></Link>
                 </Box>
                 {
-                    user ? (
+                    user && userInfo ? (
                         <>
                             <Box className={Styles.links} visibleFrom="sm">
                                 <AuthenticatedHeader userInfo={userInfo} />
@@ -40,6 +40,10 @@ export default async function Header({ fixed = true }: { fixed?: boolean }) {
 
                                     <Link href={`/user/${userInfo._id}`} className={Styles['drawer_item']}>내 사진</Link>
                                     <Link href={`/manage/pictures/${userInfo._id}`} className={Styles['drawer_item']}>사진 관리</Link>
+
+                                    <Divider my="sm" />
+
+                                    <Link href={`/settings`} className={Styles['drawer_item']}>설정</Link>
 
                                     <Divider my="sm" />
                                     

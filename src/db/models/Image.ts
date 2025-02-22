@@ -15,6 +15,7 @@ export interface IComment {
 export interface ImageInterface {
     _id: string;
     url: string;
+    s3_key: string;
     width: number;
     height: number;
     title: string;
@@ -33,6 +34,7 @@ type ImageModel = Model<ImageInterface>;
 export const ImageSchema: Schema = new Schema<ImageInterface, ImageModel>({
     _id: { type: String, default: () => new Types.ObjectId().toString() },
     url: { type: String, required: true },
+    s3_key: { type: String, required: true },
     width: { type: Number, required: true },
     height: { type: Number, required: true },
     title: { type: String, required: true },

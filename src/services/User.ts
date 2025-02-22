@@ -2,6 +2,7 @@ import dbConnect from "@/db/init";
 import User, { UserInterface } from "@/db/models/User";
 import { HydratedDocument } from "mongoose";
 import { SearchResult } from "./types";
+import { ManagementClient } from "auth0";
 
 // 이미지 문서의 owner 속성 populate
 export const ownerLookupPipeline = [
@@ -141,7 +142,7 @@ export async function addImageToUser(sub: string, imageId: string) {
 
 export async function deleteUserBySub(sub: string) {
     await dbConnect();
-    await User.deleteOne({ sub });
+    return (await User.deleteOne({ sub })).acknowledged;
 }
 
 export async function searchUsers(
@@ -182,4 +183,29 @@ export async function searchUsers(
         totalCount, 
         totalPages: Math.ceil(totalCount / pageSize),
     };
+}
+
+export async function deleteUserAuth0(userSub: string) {
+    const AUTH0_DEFAULT_TENENT = process.env.AUTH0_DEFAULT_TENENT;
+    const AUTH0_CLIENT_ID = process.env.AUTH0_M2M_CLIENT_ID;
+    const AUTH0_CLIENT_SECRET = process.env.AUTH0_M2M_CLIENT_SECRET;
+    
+    if (
+        typeof AUTH0_DEFAULT_TENENT === 'undefined' ||
+        typeof AUTH0_CLIENT_ID === 'undefined' ||
+        typeof AUTH0_CLIENT_SECRET === 'undefined'
+    ) {
+        return false;
+    }
+
+    const management = new ManagementClient({
+        domain: AUTH0_DEFAULT_TENENT,
+        clientId: AUTH0_CLIENT_ID,
+        clientSecret: AUTH0_CLIENT_SECRET,
+    });
+    const res = await management.users.delete({
+        id: userSub
+    })
+
+    return res.status === 204;
 }

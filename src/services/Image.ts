@@ -7,6 +7,7 @@ import { getUserById, getUserBySub, ownerLookupPipeline } from "./User";
 import User, { IUserInfo, UserInterface } from "@/db/models/User";
 import { getVisibilityPipeline } from "@/utils/service";
 import { SearchResult } from "./types";
+import { DeletedObject, S3, waitUntilObjectNotExists } from "@aws-sdk/client-s3";
 
 export interface ImageWithOwner extends ImageInterface {
     ownerDetails: UserInterface;
@@ -149,22 +150,28 @@ export async function getSurroundingImagesById(imageId: string, radius: number, 
  * @param lastItemId pagination을 위한 마지막 이미지 문서의 _id
  * @returns ImageWithOwner[]
  */
-export async function getUserImages(limit: number = 10, userId: string, viewerId?: string, lastItemId?: string) {
+export async function getUserImages(userId: string, limit?: number, viewerId?: string, lastItemId?: string) {
     await dbConnect();
 
-    return await Image.aggregate<ImageWithOwner>([
+    const pipes: PipelineStage[] = [
         ...ownerLookupPipeline,
         ...getVisibilityPipeline(viewerId),
         {
             $match: {
                 ...(lastItemId && { _id: { $gt: lastItemId } }),
                 owner: userId,
-            }
+            },
+           
         },
-        {
+    ]
+
+    if (typeof limit === 'number') {
+        pipes.push({
             $limit: limit
-        }
-    ])
+        })
+    }
+
+    return await Image.aggregate<ImageWithOwner>(pipes)
 }
 
 export async function getUserImagesByDate(limit: number = 10, userId: string, viewerId?: string, lastImageDate?: number): Promise<[number, ImageWithOwner[]][]> {
@@ -580,6 +587,33 @@ export async function searchImages(query: string, viewerId?: string, page: numbe
         totalCount,
         totalPages: Math.ceil(totalCount / pageSize),
     };
+}
+
+export async function deleteS3Images(s3_keys: string[]) {
+    let _deleted: DeletedObject[] | undefined = [];
+    try {
+        const s3 = new S3({
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
+            },
+    
+            region: process.env.AWS_REGION
+        });
+    
+        const { Deleted } = await s3.deleteObjects({
+            Bucket: process.env.S3_BUCKET_NAME!,
+            Delete: {
+                Objects: s3_keys.map(k => ({ Key: k }))
+            }
+        })
+
+        _deleted = Deleted;
+    } catch(err) {
+        console.log('S3 Bucket Object 삭제 실패 ', err)
+    } finally {
+        return _deleted ? _deleted.length > 0 : false;
+    }
 }
 
 export async function deleteImages(imageIds: string[]) {

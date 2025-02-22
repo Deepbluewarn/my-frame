@@ -1,7 +1,8 @@
 'use server'
 
-import { followUser, getUserBySub, getUserWithFollowInfo, searchUsers, unFollowUser } from "@/services/User";
+import { deleteUserAuth0, deleteUserBySub, followUser, getUserBySub, getUserWithFollowInfo, searchUsers, unFollowUser } from "@/services/User";
 import { getSession } from "@auth0/nextjs-auth0";
+import { actionDeleteAllUserImages } from "../image";
 
 export async function actionGetUserIdBySub(sub?: string) {
     let session = await getSession();
@@ -22,8 +23,12 @@ export async function actionGetUserBySub(sub: string) {
     return await getUserBySub(sub);
 }
 
-export async function actionGetUserWithFollowInfo(_id: string, targetUserSub: string) {
-    const targetUserId = (await getUserBySub(targetUserSub))?._id || '';
+export async function actionGetUserWithFollowInfo(_id: string, targetUserSub?: string) {
+    let targetUserId = '';
+
+    if (typeof targetUserSub !== 'undefined') {
+        targetUserId = (await getUserBySub(targetUserSub))?._id || '';
+    }
     return await getUserWithFollowInfo(_id, targetUserId);
 }
 
@@ -40,4 +45,32 @@ export async function actionUnFollowUser(targetUserId: string, userSub: string) 
 export async function actionSearchUsers(query: string, targetUserSub: string, page: number = 1, pageSize: number = 10) {
     const targetUserId = (await getUserBySub(targetUserSub))?._id || '';
     return await searchUsers(query, targetUserId, page, pageSize);
+}
+
+export async function actionDeleteUser() {
+    const session = await getSession();
+
+    if (!session) {
+        throw new Error('세션을 찾을 수 없습니다.');
+    }
+
+    const user = session.user;
+
+    const auth0_user_deleted = await deleteUserAuth0(user.sub);
+    const user_deleted = await deleteUserBySub(user.sub);
+
+    return { auth0_user_deleted, user_deleted }
+}
+
+export async function actionUserSelfDelete(userId: string) {
+    const session = await getSession();
+
+    if (!session) {
+        throw new Error('세션을 찾을 수 없습니다.');
+    }
+
+    const { images_deleted, s3_deleted } = await actionDeleteAllUserImages(userId);
+    const { auth0_user_deleted, user_deleted } = await actionDeleteUser();
+
+    return auth0_user_deleted && user_deleted && images_deleted && s3_deleted;
 }

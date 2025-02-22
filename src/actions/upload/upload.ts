@@ -19,14 +19,13 @@ const s3 = new S3({
     region: process.env.AWS_REGION
 });
 
-async function uploadImageToS3(file: File) {
+async function uploadImageToS3(file: File, key: string) {
     const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const today = new Date().getTime();
+    const buffer = Buffer.from(bytes);
 
     const params = {
         Bucket: process.env.S3_BUCKET_NAME!,
-        Key: `${file.name}_${today}`,
+        Key: key,
         Body: buffer,
         ContentType: file.type
     };
@@ -77,13 +76,16 @@ export const UploadAction = async (metadata: ImageInterface[] | null, data: Form
         if (!userDocument) return { success: false, error: 'User not found' };
 
         for (const metaFile of metaFiles) {
-            const url = (await uploadImageToS3(metaFile.fileObject)).Location;
+            const fileObj = metaFile.fileObject;
+            const key = `${fileObj.name}_${new Date().getTime()}`;
+            const url = (await uploadImageToS3(fileObj, key)).Location;
     
             if (!url) throw new Error('Failed to upload image to S3');
     
             const savedImage = await createImage({
                 _id: new Types.ObjectId().toString(),
                 url,
+                s3_key: key,
                 width: metaFile.width,
                 height: metaFile.height,
                 title: metaFile?.name,
