@@ -14,6 +14,12 @@ export default function LoggedOut() {
         { email: 'test1@bluewarn.dev', password: '8&mvBF%&Z1xtKC' },
         { email: 'test2@bluewarn.dev', password: '$jh!0vfL@1@7t!' },
     ];
+    const backgroundImages = [
+        'https://myframe.s3.ap-northeast-2.amazonaws.com/winter-9416919.jpg_1740205259116',
+        'https://myframe.s3.ap-northeast-2.amazonaws.com/DSC03061.jpg_1740208914706',
+        'https://myframe.s3.ap-northeast-2.amazonaws.com/building-9340309.jpg_1740209479206',
+        'https://myframe.s3.ap-northeast-2.amazonaws.com/paris-7539257.jpg_1740209414778',
+    ]
     const rows = testAccounts.map((element) => (
         <TableTr key={element.email}>
             <TableTd>{element.email}</TableTd>
@@ -43,10 +49,9 @@ export default function LoggedOut() {
         <>
             <div className={Styles.background} ref={backgroundRef}>
                 <div className={Styles['background-overlay']}></div>
-                <img src="https://myframe.s3.ap-northeast-2.amazonaws.com/bird-9376831.jpg_1739855934330" alt="" />
-                <img src="https://myframe.s3.ap-northeast-2.amazonaws.com/hot-air-balloons-9271140.jpg_1739855934446" alt="" />
-                <img src="https://myframe.s3.ap-northeast-2.amazonaws.com/forest-9380294.jpg_1739855934130" alt="" />
-                <img src="https://live.staticflickr.com/65535/52524654654_f5de67eea5_o_d.jpg" alt="" />
+                {
+                    backgroundImages.map(i => <img key={i} src={i}></img>)
+                }
             </div>
 
             <div className={`${Styles.message}`}>
