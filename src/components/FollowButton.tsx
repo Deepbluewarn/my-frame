@@ -1,7 +1,7 @@
 'use client'
 
 import { actionFollowUser, actionGetUserWithFollowInfo, actionUnFollowUser } from "@/actions/user";
-import { Button } from "@mantine/core";
+import { Box, Button, Loader } from "@mantine/core";
 import { useCallback, useEffect, useState } from "react";
 
 export default function FollowButton(
@@ -25,6 +25,7 @@ export default function FollowButton(
 
     useEffect(() => {
         const asyncFn = async () => {
+            setLoading(false);
             const userFollowInfo = (await actionGetUserWithFollowInfo(userId, currentUserSub))[0];
             setFollowed(userFollowInfo.followed);
             setLoading(true);
@@ -35,7 +36,11 @@ export default function FollowButton(
     return (
         <Button onClick={toggleFollow}>
             {
-                loading ? (followed ? '언팔로우' : '팔로우') : ''
+                loading ?
+                    (followed ? '언팔로우' : '팔로우') :
+                    <Box m={8}>
+                        <Loader color="white" type="dots" size='sm' />
+                    </Box>
             }
         </Button>
     )

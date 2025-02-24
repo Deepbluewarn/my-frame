@@ -11,11 +11,13 @@ import { useUserInfoStore } from "@/providers/userid-store-provider";
 import { actionGetUserWithFollowInfo } from "@/actions/user";
 
 // userInfo: 표시하고자 하는 회원 객체
-export default function ProfileAvatar({ userId } : { userId?: string }) {
+export default function ProfileAvatar(
+    { userId, userInfo } : { userId?: string, userInfo?: IUserWithFollowInfo }
+) {
     // currentUser: 현재 접속한 회원의 객체
     const { user: currentUser, error, isLoading } = useUser();
     const currentUserId = useUserInfoStore(store => store._id);
-    const [userInfo, setUserInfo] = useState<IUserWithFollowInfo | undefined>();
+    const [uinfo, setUInfo] = useState<IUserWithFollowInfo | undefined>(userInfo);
 
     useEffect(() => {
         const asyncFn = async () => {
@@ -24,39 +26,42 @@ export default function ProfileAvatar({ userId } : { userId?: string }) {
             if (typeof userId === 'undefined') {
                 uid = currentUserId;
             }
-            setUserInfo((await actionGetUserWithFollowInfo(uid!))[0]);
+            setUInfo((await actionGetUserWithFollowInfo(uid!))[0]);
         }
-        asyncFn();
+
+        if (userId) {
+            asyncFn();
+        }
     }, [])
 
-    if (!userInfo) {
+    if (!uinfo) {
         return null;
     }
-    if (!currentUser || !currentUser.sub) {
+    if (!currentUser || !currentUser.sub || error || isLoading) {
         return null;
     }
 
     return (
         <Flex gap={8}>
-            <Avatar src={userInfo.profilePicture} alt={userInfo.username} />
+            <Avatar src={uinfo.profilePicture} alt={uinfo.username} />
             <Flex direction='column' gap={8}>
                 <Flex align={'center'} gap={16}>
                     <Text component="div" style={{
                         maxWidth: '10rem',
                         wordBreak: 'break-word',
-                    }}>{userInfo.username}</Text>
+                    }}>{uinfo.username}</Text>
                     {
-                        currentUser?.sub === userInfo?.sub ? (
+                        currentUser?.sub === uinfo?.sub ? (
                             null
                         ) : (
-                            <FollowButton userId={userInfo._id} currentUserSub={currentUser.sub} />
+                            <FollowButton userId={uinfo._id} currentUserSub={currentUser.sub} />
                         )
                     }
                 </Flex>
 
                 <Flex gap={16}>
-                    <Text>{`${userInfo.followersCount} 팔로워`}</Text>
-                    <Text>{`${userInfo.followingCount} 팔로잉`}</Text>
+                    <Text>{`${uinfo.followersCount} 팔로워`}</Text>
+                    <Text>{`${uinfo.followingCount} 팔로잉`}</Text>
                 </Flex>
             </Flex>
         </Flex>
