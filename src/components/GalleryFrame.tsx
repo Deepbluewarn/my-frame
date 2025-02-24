@@ -46,7 +46,7 @@ export default function GalleryFrame({
   }, [star])
 
   const image = (
-    <Image
+    <img
       src={gallery.url}
       alt={gallery.title}
       width={resize ? resized[0] : gallery.width}

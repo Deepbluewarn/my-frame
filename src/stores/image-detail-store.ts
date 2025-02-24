@@ -180,6 +180,25 @@ export function createImageDetailStore(initData: InitImageDetail) {
                     if (newId) {
                         get().actions.common.setId(newId);
                         updateHistory(`/image/${newId}`);
+
+                        // prefetch image
+
+                        let targetImageId = '';
+
+                        if (direction === 'prev') {
+                            targetImageId = ids[currIdx - 2]
+                        } else {
+                            targetImageId = ids[currIdx + 2]
+                        }
+
+                        if (targetImageId !== '') {
+                            const prefetch = new Image();
+                            const image = images.find(img => img._id === targetImageId)
+                            
+                            if (image) {
+                                prefetch.src = image.url;
+                            }
+                        }
                     }
                 },
                 comment: {
