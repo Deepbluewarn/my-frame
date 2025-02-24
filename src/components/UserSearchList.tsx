@@ -18,11 +18,11 @@ export default function UserSearchList({ query } : { query: string }) {
             if (!user || !user.sub) {
                 return;
             }
-            const users = await actionSearchUsers(query, user.sub);
+            const users = await actionSearchUsers(query, user.sub, page);
             setUsers(users);
         }
         asyncFn();
-    }, [user])
+    }, [user, page])
 
     if (!users) {
         return null;
