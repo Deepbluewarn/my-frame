@@ -12,7 +12,7 @@ import {
     getImageStarList, 
     getNextImagesById, 
     getPrevImagesById, 
-    getPublicImages, 
+    getRecentPublicImages, 
     getSurroundingImagesById,
     getUserImages,
     getUserImagesByDate,
@@ -55,8 +55,8 @@ export async function actionGetUserImagesByDate(params: UserImagePaginationParam
     return await getUserImagesByDate(params.limit, params.user_id, viewerId, params.last_image_date);
 }
 
-export async function actionGetPublicImages(params: ImagePaginationParams) {
-    return await getPublicImages(params.limit, params.last_image_id)
+export async function actionGetRecentPublicImages(params: ImagePaginationParams) {
+    return await getRecentPublicImages(params.limit, params.last_image_id)
 }
 
 export async function actionGetNextImagesById(_current_id: string, limit?: number) {
@@ -179,7 +179,7 @@ export async function actionUpdateImageDescription(imageId: string, new_descript
     return await updateImageDescription(imageId, new_description);
 }
 
-export async function actionGetFollowerListWithImages(page: number = 1) {
+export async function actionGetFollowerListWithImages(page: number = 1, pageSize: number = 10) {
     const session = await getSession();
     const user = session?.user;
 
@@ -187,7 +187,7 @@ export async function actionGetFollowerListWithImages(page: number = 1) {
         return [];
     }
 
-    return await getFollowerListWithImages(user.sub, page);
+    return await getFollowerListWithImages(user.sub, page, pageSize);
 }
 
 export async function actionSearchImages(query: string, page: number = 1, pageSize: number = 10) {

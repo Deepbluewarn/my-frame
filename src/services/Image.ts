@@ -39,16 +39,21 @@ export async function getImageById(_id: string, viewerId?: string) {
     return (await getImage({ _id: _id }, viewerId))[0];
 }
 
-export async function getPublicImages(limit: number = 10, _id?: string) {
+export async function getRecentPublicImages(limit: number = 10, _id?: string) {
     await dbConnect();
     const pipelines: PipelineStage[] = [
         ...ownerLookupPipeline,
+        {
+            $sort: {
+                _id: -1
+            }
+        }
     ];
 
     if (_id) {
         pipelines.push({
             $match: {
-                _id: { $gt: _id },
+                _id: { $lt: _id },
             },
         })
     }
@@ -494,8 +499,7 @@ export async function updateImageDescription(imageId: string, new_description: s
  * @param lastUserId pagination 구현, 팔로워 배열의 마지막 유저의 _id로 다음 페이지를 가져옴
  * @returns 
  */
-export async function getFollowerListWithImages(userSub: string, page: number = 1) {
-    const pageSize = 1;
+export async function getFollowerListWithImages(userSub: string, page: number = 1, pageSize: number = 10) {
     // users 문서에서 팔로우 목록을 가져온다. (users의 _id로 구성된 배열)
     // 이 배열의 각 요소를 기준으로 이미지 목록을 가져온다.
 
