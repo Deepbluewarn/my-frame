@@ -1,3 +1,5 @@
+import DefaultLoading from "@/components/Loading/DefaultLoading";
+
 export default function Loading() {
-    return <p>로딩 중..</p>
+    return <DefaultLoading />;
 }

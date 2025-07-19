@@ -1,9 +1,5 @@
-import { Text } from '@mantine/core';
+import DefaultLoading from "@/components/Loading/DefaultLoading";
 
 export default function Loading() {
-    return (
-        <>
-            <Text>회원 정보를 불러오는 중입니다..</Text>
-        </>
-    )
+    return <DefaultLoading />;
 }
