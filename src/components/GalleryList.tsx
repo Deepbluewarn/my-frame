@@ -59,17 +59,23 @@ export default function GalleryList<T extends ImagePaginationParams, R extends I
                 images.length > 0 ? (
                     <GalleryComponent images={images} />
                 ) : (
-                    <Grid grow>
-                        {
-                            Array(8).fill(0).map((_, idx) => (
-                                <Grid.Col key={idx} span={3}>
-                                    <AspectRatio ratio={600 / 400} mx="auto">
-                                        <Skeleton />
-                                    </AspectRatio>
-                                </Grid.Col>
-                            ))
-                        }
-                    </Grid>
+                        loading ? (
+                            <Grid grow>
+                                {
+                                    Array(8).fill(0).map((_, idx) => (
+                                        <Grid.Col key={idx} span={3}>
+                                            <AspectRatio ratio={600 / 400} mx="auto">
+                                                <Skeleton />
+                                            </AspectRatio>
+                                        </Grid.Col>
+                                    ))
+                                }
+                            </Grid>
+                        ) : (
+                            <Flex justify={'center'} align={'center'} style={{height: '10rem'}}>
+                                <Text>사진이 없습니다.</Text>
+                            </Flex>
+                        )
                 )
             }
 
