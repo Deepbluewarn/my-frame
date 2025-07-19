@@ -19,7 +19,7 @@ export default async function Header({ fixed = true }: { fixed?: boolean }) {
         <header className={headerClassNames.join(' ')}>
             <div className={Styles.inner}>
                 <Box className={Styles.logo}>
-                    <Link href={'/'}><Text fw={700} size="lg">MY FRAME</Text></Link>
+                    <Link href={'/'}><Text fw={700} size="lg">THE FRAME</Text></Link>
                 </Box>
                 {
                     user && userInfo ? (

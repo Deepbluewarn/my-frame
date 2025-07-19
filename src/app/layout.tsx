@@ -13,8 +13,8 @@ import { actionGetUserIdBySub } from '@/actions/user';
 import NextTopLoader from 'nextjs-toploader';
 
 export const metadata: Metadata = {
-  title: `${process.env.NODE_ENV === 'development' ? '[DEV]' : ''} My Frame`,
-  description: "사진을 등록하고 슬라이드를 볼 수 있는 서비스입니다.",
+  title: `${process.env.NODE_ENV === 'development' ? '[DEV]' : ''} THE FRAME`,
+  description: "사진 공유 플랫폼 THE FRAME",
 };
 
 export default async function RootLayout({
@@ -34,7 +34,6 @@ export default async function RootLayout({
       <UserInfoStoreProvider value={{ _id: userId || '', sub: user?.sub}}>
         <UserProvider>
           <body>
-            <NextTopLoader />
             <MantineProvider>
               <Header fixed={true} />
               <main className={`${HomeStyles.container}`}>
@@ -42,8 +41,7 @@ export default async function RootLayout({
               </main>
               <footer className={HomeStyles.footer}>
                 <div>
-                  <p>사진을 공유할 수 있는 소셜 플랫폼 <b className={HomeStyles.bold}>MY FRAME</b></p>
-                  <p>이 사이트는 개인 포트폴리오 제작을 목적으로 만들어졌습니다.</p>
+                  <p><b>THE FRAME</b></p>
                 </div>
                 <div className={HomeStyles.social_links}>
                   <ul>
