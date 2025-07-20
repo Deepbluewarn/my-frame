@@ -39,10 +39,11 @@ export async function getImageById(_id: string, viewerId?: string) {
     return (await getImage({ _id: _id }, viewerId))[0];
 }
 
-export async function getRecentPublicImages(limit: number = 10, _id?: string) {
+export async function getRecentPublicImages(limit: number = 10, _id?: string, viewerId?: string) {
     await dbConnect();
     const pipelines: PipelineStage[] = [
         ...ownerLookupPipeline,
+        ...getVisibilityPipeline(viewerId),
         {
             $sort: {
                 _id: -1

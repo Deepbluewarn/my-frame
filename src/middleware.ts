@@ -4,10 +4,10 @@ export default withMiddlewareAuthRequired()
 export const config = {
   matcher: [
     '/upload',
-    '/image/:imageId*', 
-    '/user/:path*',
+    // '/image/:imageId*', 
+    // '/user/:path*',
     '/search/:path*',
-    '/explore/:path*',
+    // '/explore/:path*',
     '/manage/pictures/:path*',
     '/settings',
     '/api',
